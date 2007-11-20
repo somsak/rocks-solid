@@ -23,16 +23,13 @@ password=xxxxxx
 [ssh]
 shutdown_cmd=/sbin/poweroff
 
-[ignore]
-host=compute-0-7,compute-4-.*
-
-[hostinfo_1]
-pattern=compute.*
-num_cpu=4
+[power_save]
+min_spare=5
+ignore_host=compute-0-7,compute-4-.*
 
 [main]
 poweron_driver=ipmi
 poweroff_driver=ssh
 scheduler=sge
-min_spare=5
+
 }}}
