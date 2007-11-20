@@ -2,7 +2,7 @@
 
 import os, sys, pwd
 
-from rocks.solid.ps import term_userps
+from rocks.solid import term_userps
 
 if len(sys.argv) > 1 :
     if sys.argv[1] == '-h' :
