@@ -81,13 +81,17 @@ def cleanipcs(ipc_list = [], user_list = []) :
 
 def all_hosts() :
     if os.access('/opt/rocks/bin/rocks', os.X_OK) :
-        cmd = popen2.Popen4('/opt/rocks/bin/rocks list host')
+        cmd = popen2.Popen4('/opt/rocks/bin/rocks list host | grep -v Frontend ')
         retval = []
         while 1 :
             line = cmd.fromchild.readline()
+            if not line :
+                break
             if line.startswith('HOST') :
                 continue
             line = line.strip()
+            if not line :
+                continue
             retval.append(line.split()[0].replace(':', ''))
         cmd.wait()
     else :
