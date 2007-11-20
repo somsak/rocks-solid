@@ -8,7 +8,6 @@
    # If #1 + #2 is < min_spare, round up to min_spare
    # return #3
   * wakeup_host() with returned value of get_require_host
-
 = Configuration =
 /etc/rocks-solid.conf
 {{{
@@ -22,6 +21,10 @@ shutdown_cmd=/sbin/poweroff
 
 [ignore]
 host=compute-0-7,compute-4-.*
+
+[hostinfo_1]
+pattern=compute.*
+num_cpu=4
 
 [main]
 poweron_driver=ipmi
