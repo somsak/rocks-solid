@@ -11,6 +11,10 @@
 = Configuration =
 /etc/rocks-solid.conf
 {{{
+[db]
+driver=sqlite
+powersave=/var/spool/rocks/powersave_shutdown.db
+
 [ipmi]
 host_pattern=s/compute/compute-ilo/
 user=admin
