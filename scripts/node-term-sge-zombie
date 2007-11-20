@@ -2,7 +2,7 @@
 
 import os, sys, pwd
 
-from rocks.solid.ps import term_userps
+from rocks.solid.ps import term_sge_zombie
 
 if len(sys.argv) > 1 :
     if sys.argv[1] == '-h' :
@@ -12,4 +12,4 @@ if len(sys.argv) > 1 :
 else :
     user_list = []
 
-term_userps(user_list)
+term_sge_zombie(user_list)
