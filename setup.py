@@ -4,7 +4,8 @@ import glob
 setup(
     name = "rocks-solid",
     version = "0.1",
-    packages = find_packages(),
+    #packages = find_packages(),
+    packages = 'rocks/solid',
     scripts = glob.glob('scripts/*-*'),
 
     # Project uses reStructuredText, so ensure that the docutils get
