@@ -1,0 +1,31 @@
+#configuration file
+= Design =
+ * Work from cron
+ * A script, called "cluster-powersave" is run every 5 minutes.
+  * get_require_host()
+   # Sum-up number of needed cpu
+   # Sum-up number of free nodes
+   # If #1 + #2 is < min_spare, round up to min_spare
+   # return #3
+  * wakeup_host() with returned value of get_require_host
+
+= Configuration =
+/etc/rocks-solid.conf
+{{{
+[ipmi]
+host_pattern=s/compute/compute-ilo/
+user=admin
+password=xxxxxx
+
+[ssh]
+shutdown_cmd=/sbin/poweroff
+
+[ignore]
+host=compute-0-7,compute-4-.*
+
+[main]
+poweron_driver=ipmi
+poweroff_driver=ssh
+scheduler=sge
+min_spare=5
+}}}
