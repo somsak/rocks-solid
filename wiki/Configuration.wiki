@@ -1,4 +1,4 @@
-#configuration file
+configuration file
 = Design =
  * Work from cron
  * A script, called "cluster-powersave" is run every 5 minutes.
