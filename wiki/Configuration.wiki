@@ -12,8 +12,8 @@
 /etc/rocks-solid.conf
 {{{
 [db]
-driver=sqlite
-powersave=/var/spool/rocks/powersave_shutdown.db
+uri=sqlite
+powersave=/var/spool/rocks/powersave_control.db
 
 [ipmi]
 host_pattern=s/compute/compute-ilo/
@@ -29,7 +29,7 @@ ignore_host=compute-0-7,compute-4-.*
 
 [main]
 poweron_driver=ipmi
-poweroff_driver=ssh
+poweroff_driver=sw
 scheduler=sge
 
 }}}
