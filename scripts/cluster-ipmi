@@ -1,0 +1,62 @@
+#!/opt/rocks/bin/python
+'''
+Execute IPMI command on specified host
+'''
+
+import sys
+
+import rocks.pssh
+
+class App(rocks.pssh.ClusterFork) :
+    def __init__(self, argv):
+        rocks.pssh.ClusterFork.__init__(self, argv)
+        self.usage_name = 'Cluster IPMI'
+        self.usage_version = '1.0'
+
+    def usageTail(self) :
+        return ' IPMI command'
+
+    def run(self, command=None):
+
+		if self.nodes:
+			nodelist = string.split(self.e.decode(self.nodes), " ")
+		else:
+			self.connect()
+			self.execute(self.query)
+			nodelist = []
+			for host, in self.cursor.fetchall():
+				nodelist.append(host)
+
+		# If no command was supplied just use whatever was
+		# left over on the argument list. 
+
+		if not command:
+			command = string.join(self.getArgs())
+			if not command:
+				self.help()
+				sys.exit(0)
+
+		sshflags = ""
+			
+		for hostname in nodelist:
+			sys.stdout.write("%s: " % hostname)
+			sys.stdout.flush()
+
+			if os.system('ping -c1 -w1 %s > /dev/null 2>&1' % \
+					(hostname)) == 0:
+				print ""
+					
+				if self.bg:
+					sshflags = "-f"
+
+				os.system("ssh %s %s \"%s\"" % \
+					(sshflags, hostname, command))
+			else:
+				print "down"
+
+		print ""
+
+
+app = App(sys.argv)
+app.parseArgs()
+app.run()

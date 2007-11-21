@@ -3,6 +3,7 @@ Rocks-solid main function
 '''
 
 import os, pwd, popen2, string
+from ConfigParser import ConfigParser
 
 known_system_users = ['fluent', 'accelrys', 'maya', 'autodesk', 'alias']
 
@@ -101,5 +102,42 @@ def all_hosts() :
         cmd.wait()
     return retval
 
-if __name__ == '__main__' :
-    print all_hosts()
+class Config :
+    poweron_driver = 'ipmi'
+    poweroff_driver = 'sw'
+    scheduler = 'sge'
+    power_min_spare = 5
+    power_ignore_host = []
+    ssh_shutdown_cmd = '/sbin/poweroff'
+    ipmi_host_pattern = 's/compute/compute-ilo/g'
+    ipmi_user = 'admin'
+    ipmi_passwd = ''
+    db_uri = 'sqlite:///var/spool/rocks/power_control.db'
+
+def config_read(file = os.path.join('etc', 'rocks-solid.conf')) :
+    '''
+    Read configuration file and return configuration object
+
+    @rtype configuration object
+    @return configuration object
+    '''
+    config = Config()
+
+    config_parser = ConfigParser()
+    config_parser.read(file)
+
+    for sect in config_parser.sections() :
+            for opt in config_parser.options(sect) :
+                if sect == 'main' :
+                    setattr(config, opt, config_parser.get('main', opt))
+                else :
+                    setattr(config, sect + '_' + opt, config_parser.get(sect, opt))
+
+    del config_parser
+
+    return config
+
+if __name__  == '__main__' :
+    c = config_read('./rocks-solid.conf')
+    for attr in dir(c) :
+        print attr, getattr(c, attr)
