@@ -23,7 +23,7 @@ password=xxxxxx
 [ssh]
 shutdown_cmd=/sbin/poweroff
 
-[power_save]
+[power]
 min_spare=5
 ignore_host=compute-0-7,compute-4-.*
 
