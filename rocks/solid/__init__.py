@@ -80,7 +80,7 @@ def cleanipcs(ipc_list = [], user_list = []) :
             options = opt_str + opt_str.join(id_list)
             os.system('ipcrm ' + options)
 
-def all_hosts() :
+def rocks_hostlist() :
     if os.access('/opt/rocks/bin/rocks', os.X_OK) :
         cmd = popen2.Popen4('/opt/rocks/bin/rocks list host | grep -v Frontend ')
         retval = []
@@ -112,6 +112,7 @@ class Config :
     ipmi_host_pattern = 's/compute/compute-ilo/g'
     ipmi_user = 'admin'
     ipmi_passwd = ''
+    ipmi_intf = 'lanplus'
     db_uri = 'sqlite:///var/spool/rocks/power_control.db'
 
 def config_read(file = os.path.join('etc', 'rocks-solid.conf')) :
