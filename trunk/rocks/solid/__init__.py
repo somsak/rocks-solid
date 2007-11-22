@@ -2,7 +2,8 @@
 Rocks-solid main function
 '''
 
-import os, pwd, popen2, string
+import os, pwd, popen2, string, sys
+from StringIO import StringIO
 from ConfigParser import ConfigParser
 
 known_system_users = ['fluent', 'accelrys', 'maya', 'autodesk', 'alias']
@@ -109,13 +110,15 @@ class Config :
     power_min_spare = 5
     power_ignore_host = []
     ssh_shutdown_cmd = '/sbin/poweroff'
+    ssh_reboot_cmd = '/sbin/reboot'
+    ssh_arg = ''
     ipmi_host_pattern = 's/compute/compute-ilo/g'
     ipmi_user = 'admin'
     ipmi_passwd = ''
     ipmi_intf = 'lanplus'
     db_uri = 'sqlite:///var/spool/rocks/power_control.db'
 
-def config_read(file = os.path.join('etc', 'rocks-solid.conf')) :
+def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     '''
     Read configuration file and return configuration object
 
@@ -138,7 +141,26 @@ def config_read(file = os.path.join('etc', 'rocks-solid.conf')) :
 
     return config
 
+class Launcher(object) :
+    def launch(self, host_list, func, more_arg = None) :
+        for host in host_list :
+            if more_arg :
+                output, error = func(host, *more_arg)
+            else :
+                output, error = func(host)
+            for o in output, error :
+                soutput = StringIO(o)
+                while 1 :
+                    line = soutput.readline()
+                    if not line : break
+                    sys.stdout.write(host.split('.')[0][:20] + ':\t' + line)
+                soutput.close()
+
 if __name__  == '__main__' :
     c = config_read('./rocks-solid.conf')
     for attr in dir(c) :
         print attr, getattr(c, attr)
+    l = Launcher()
+    def test_func(host, ab, cd) :
+        print host, ab, cd
+    l.launch(['compute-0-0', 'compute-0-1', 'compute-0-2'], test_func, ['test1', 'test2'])

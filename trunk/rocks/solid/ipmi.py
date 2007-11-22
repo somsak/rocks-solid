@@ -2,15 +2,15 @@
 '''
 IPMI Launcher
 '''
-import re, os, sys, string
+import re, os, sys, string, popen2
 
-from rocks.solid import config_read
+from rocks.solid import Launcher
 import rocks.pssh
 
 class ClusterIPMI(rocks.pssh.ClusterFork) :
-    def __init__(self, argv, config_file) :
+    def __init__(self, argv, config) :
         rocks.pssh.ClusterFork.__init__(self, argv)
-        self.ipmi = IPMI(config_file)
+        self.ipmi = IPMI(config)
 
     def usageTail(self) :
         return ' IPMI command'
@@ -26,20 +26,21 @@ class ClusterIPMI(rocks.pssh.ClusterFork) :
             for host, in self.cursor.fetchall():
                 nodelist.append(host)
 
-        self.ipmi.cmd(nodelist, self.getArgs())
+        args = self.getArgs()
+        if not args :
+            self.help()
+            sys.exit(0)
+        self.ipmi.cmd_all(nodelist, self.getArgs())
 
 class IPMI(object) :
-    def __init__(self, config_file = None) :
+    def __init__(self, config) :
         '''
         Initialize IPMI helper
 
         @type config_file string
         @param config_file configuration file
         '''
-        if config_file :
-            self.config = config_read(config_file)
-        else :
-            self.config = config_read()
+        self.config = config
 
         os.environ['IPMI_PASSWORD'] = self.config.ipmi_passwd
         self.ipmi_arg = '-I ' + self.config.ipmi_intf + ' -E -H %s -U ' + self.config.ipmi_user + ' '
@@ -55,6 +56,7 @@ class IPMI(object) :
         else :
             # execution pattern
             self.gen_host = self._host_command
+        self.launcher = Launcher()
 
     def _host_substitute(self, host) :
         '''
@@ -89,7 +91,7 @@ class IPMI(object) :
         for host in host_list :
             yield self.gen_host(host)
 
-    def cmd(self, host_list, args) :
+    def cmd_all(self, host_list, args) :
         '''
         Issue IPMI command to remote host
 
@@ -101,26 +103,35 @@ class IPMI(object) :
         new_args = '"'
         new_args = new_args + '" "'.join(args)
         new_args = new_args + '"'
-        for host in self.iterate(host_list) :
-            if os.system('ping -c1 -w1 %s > /dev/null 2>&1' % host) == 0 :
-                cmdline = 'ipmitool ' + self.ipmi_arg % host + new_args
-#                print cmdline
-                cmd = os.popen(cmdline, 'r')
-                while 1 :
-                    line = cmd.readline()
-                    if not line :
-                        break
-                    line = host.split('.')[0][:20] + ':\t' + line
-                    sys.stdout.write(line)
-                cmd.close()
-            else :
-                sys.stdout.write('%s:\tdown\n' % host.split('.')[0][:20])
+        self.launcher.launch(self.iterate(host_list), self.cmd, [new_args])
+    
+    def cmd(self, host, args, ) :
+        '''
+        Issue IPMI command to a remote host
+
+        @type host string
+        @param host host to issue command to
+        @type args list of string
+        @param args IPMI command
+        '''
+        if os.system('ping -c1 -w1 %s > /dev/null 2>&1' % host) == 0 :
+            cmdline = 'ipmitool ' + self.ipmi_arg % host + args
+            cmd = popen2.Popen3(cmdline, capturestderr=True)
+            output = cmd.fromchild.read()
+            error = cmd.childerr.read()
+            cmd.wait()
+        else :
+            output = ''
+            error = 'down'
+        return output, error
 
 if __name__ == '__main__' :
     from rocks.solid import rocks_hostlist
+    from rocks.solid import config_read
 
-    #ipmi = IPMI('./rocks-solid.conf')
+    ipmi = IPMI(config_read('./rocks-solid.conf'))
     #print ipmi.gen_hostlist(rocks_hostlist())
     #for host in ipmi.iterate(rocks_hostlist()) :
     #    print host
     #ipmi.cmd(rocks_hostlist(), ['power', 'status'])
+    ipmi.cmd_all(rocks_hostlist(), ['power', 'status'])
