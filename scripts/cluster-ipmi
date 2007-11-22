@@ -7,14 +7,15 @@ import sys, os
 
 import rocks.pssh
 import rocks.solid.ipmi
+from rocks.solid import config_read
 
 class App(rocks.solid.ipmi.ClusterIPMI) :
     def __init__(self, argv):
         if os.environ.has_key('ROCKS_SOLID_CONF') :
-            config_file = os.environ['ROCKS_SOLID_CONF']
+            config = config_read(os.environ['ROCKS_SOLID_CONF'])
         else :
-            config_file = None
-        rocks.solid.ipmi.ClusterIPMI.__init__(self, argv, config_file)
+            config = config_read()
+        rocks.solid.ipmi.ClusterIPMI.__init__(self, argv, config)
         self.usage_name = 'Cluster IPMI'
         self.usage_version = '1.0'
 
