@@ -2,11 +2,18 @@
 Rocks-solid main function
 '''
 
-import os, pwd, popen2, string, sys
+import os, pwd, popen2, string, sys, time
 from StringIO import StringIO
 from ConfigParser import ConfigParser
 
 known_system_users = ['fluent', 'accelrys', 'maya', 'autodesk', 'alias']
+
+def module_factory(name):
+    mod = __import__(name)
+    components = name.split('.')
+    for comp in components[1:]:
+        mod = getattr(mod, comp)
+    return mod
 
 def term_userps(user_list = []) :
     ps = os.popen('ps h -eo pid,user', 'r')
@@ -106,6 +113,8 @@ def rocks_hostlist() :
 class Config :
     poweron_driver = 'ipmi'
     poweroff_driver = 'sw'
+    powerreset_driver = 'sw'
+    powerstatus_driver = 'ipmi'
     scheduler = 'sge'
     power_min_spare = 5
     power_ignore_host = []
@@ -142,8 +151,12 @@ def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     return config
 
 class Launcher(object) :
-    def launch(self, host_list, func, more_arg = None) :
+    def launch(self, host_list, func, more_arg = None, delay = 0) :
         for host in host_list :
+            if delay > 0:
+                time.sleep(delay)
+            #elif delay == -1
+            #   do background
             if more_arg :
                 output, error = func(host, *more_arg)
             else :
