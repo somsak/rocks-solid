@@ -4,7 +4,7 @@ IPMI Launcher
 '''
 import re, os, sys, string, popen2
 
-from rocks.solid import Launcher
+from rocks-solid import Launcher
 import rocks.pssh
 
 class ClusterIPMI(rocks.pssh.ClusterFork) :
