@@ -1,19 +1,19 @@
 from setuptools import setup, find_packages
 import os, glob, sys
 
-def list_my_packages() :
-    retval = ['rocks/solid']
-    for dir in os.listdir('rocks' + os.sep + 'solid') :
-        path = os.path.join('rocks', 'solid', dir)
-        if os.path.isdir(path) and (dir != '.svn') and (dir != 'CVS') :
-            retval.append(os.path.join('rocks', 'solid', dir))
-    return retval
+#def list_my_packages() :
+#    retval = ['rocks/solid']
+#    for dir in os.listdir('rocks' + os.sep + 'solid') :
+#        path = os.path.join('rocks', 'solid', dir)
+#        if os.path.isdir(path) and (dir != '.svn') and (dir != 'CVS') :
+#            retval.append(os.path.join('rocks', 'solid', dir))
+#    return retval
 
 setup(
     name = "rocks-solid",
     version = "0.1",
-    #packages = find_packages(),
-    packages = list_my_packages(),
+    packages = find_packages(),
+#    packages = list_my_packages(),
     scripts = glob.glob('scripts/*-*'),
 
     # Project uses reStructuredText, so ensure that the docutils get
