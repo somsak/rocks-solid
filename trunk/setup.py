@@ -18,7 +18,7 @@ setup(
 
     # Project uses reStructuredText, so ensure that the docutils get
     # installed or upgraded on the target machine
-    install_requires = ['docutils >= 0.3'],
+#    install_requires = ['docutils >= 0.3'],
 
 #    package_data = {
 #        # If any package contains *.txt or *.rst files, include them:
@@ -27,6 +27,11 @@ setup(
 #        'hello': ['*.msg'],
 #    },
     # metadata for upload to PyPI
+    entry_points = {
+        'console_scripts': [
+            'cluster-ipmi-sh = rocks.solid.app:run_cluster_ipmi',
+        ]
+    },
     author = "Somsak Sriprayoonsakul",
     author_email = "somsaks@gmail.com",
     description = "Rocks-solid packages",
