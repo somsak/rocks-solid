@@ -12,9 +12,6 @@ class ClusterIPMI(rocks.pssh.ClusterFork) :
         rocks.pssh.ClusterFork.__init__(self, argv)
         self.ipmi = IPMI(config)
 
-    def usageTail(self) :
-        return ' IPMI command'
-
     def run(self, command=None):
 
         if self.nodes:
@@ -91,7 +88,7 @@ class IPMI(object) :
         for host in host_list :
             yield self.gen_host(host)
 
-    def cmd_all(self, host_list, args) :
+    def cmd_all(self, host_list, args, delay = 0) :
         '''
         Issue IPMI command to remote host
 
@@ -103,9 +100,9 @@ class IPMI(object) :
         new_args = '"'
         new_args = new_args + '" "'.join(args)
         new_args = new_args + '"'
-        self.launcher.launch(self.iterate(host_list), self.cmd, [new_args])
+        self.launcher.launch(self.iterate(host_list), self.cmd, [new_args], delay)
     
-    def cmd(self, host, args, ) :
+    def cmd(self, host, args) :
         '''
         Issue IPMI command to a remote host
 
@@ -116,9 +113,9 @@ class IPMI(object) :
         '''
         if os.system('ping -c1 -w1 %s > /dev/null 2>&1' % host) == 0 :
             cmdline = 'ipmitool ' + self.ipmi_arg % host + args
-            cmd = popen2.Popen3(cmdline, capturestderr=True)
+            cmd = popen2.Popen4(cmdline)
             output = cmd.fromchild.read()
-            error = cmd.childerr.read()
+            error = ''
             cmd.wait()
         else :
             output = ''

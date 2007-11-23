@@ -1,0 +1,27 @@
+#!/opt/rocks/bin/python
+'''
+Power on/off/reset on specified host
+'''
+
+import sys, os
+
+import rocks.pssh
+import rocks.solid.power
+from rocks.solid import config_read
+
+class App(rocks.solid.power.ClusterPower) :
+    def __init__(self, argv):
+        if os.environ.has_key('ROCKS_SOLID_CONF') :
+            config = config_read(os.environ['ROCKS_SOLID_CONF'])
+        else :
+            config = config_read()
+        rocks.solid.power.ClusterPower.__init__(self, argv, config)
+        self.usage_name = 'Cluster Power'
+        self.usage_version = '1.0'
+
+    def usageTail(self) :
+        return ' on/off/reset/status'
+
+app = App(sys.argv)
+app.parseArgs()
+app.run()
