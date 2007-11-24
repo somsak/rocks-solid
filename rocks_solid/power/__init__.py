@@ -5,8 +5,8 @@ Power controller
 import popen2, sys
 
 import rocks.pssh
-from rocks.solid import Launcher
-from rocks.solid import module_factory
+from rocks_solid import Launcher
+from rocks_solid import module_factory
 
 class BasePower(object) :
     def __init__(self, config) :
@@ -30,32 +30,37 @@ class ClusterPower(rocks.pssh.ClusterFork) :
         rocks.pssh.ClusterFork.__init__(self, argv)
         self.config = config
         power = {}
+        self.usage_name = 'Cluster Power'
+        self.usage_version = '1.0'
 
         try :
-            p = module_factory('rocks.solid.power.%s' % (self.config.poweron_driver))
+            p = module_factory('rocks_solid.power.%s' % (self.config.poweron_driver))
             power['on'] = p.Power(config)
         except ImportError :
             raise IOError('No module named %s' % self.config.poweron_driver)
 
         try :
-            p = module_factory('rocks.solid.power.%s' % (self.config.poweroff_driver))
+            p = module_factory('rocks_solid.power.%s' % (self.config.poweroff_driver))
             power['off'] = p.Power(config)
         except ImportError :
             raise IOError('No module named %s' % self.config.poweroff_driver)
 
         try :
-            p = module_factory('rocks.solid.power.%s' % (self.config.powerreset_driver))
+            p = module_factory('rocks_solid.power.%s' % (self.config.powerreset_driver))
             power['reset'] = p.Power(config)
         except ImportError :
             raise IOError('No module named %s' % self.config.powerreset_driver)
 
         try :
-            p = module_factory('rocks.solid.power.%s' % (self.config.powerstatus_driver))
+            p = module_factory('rocks_solid.power.%s' % (self.config.powerstatus_driver))
             power['status'] = p.Power(config)
         except ImportError :
             raise IOError('No module named %s' % self.config.powerstatus_driver)
 
         self.power = power
+
+    def usageTail(self) :
+        return ' on/off/reset/status'
 
     def run(self, command=None):
 
@@ -81,10 +86,10 @@ class ClusterPower(rocks.pssh.ClusterFork) :
 
 if __name__ == '__main__' :
     import sys
-    from rocks.solid import rocks_hostlist
-    from rocks.solid import config_read
-    from rocks.solid.power.ipmi import IPMIPower
-    from rocks.solid.power.sw import SWPower
+    from rocks_solid import rocks_hostlist
+    from rocks_solid import config_read
+    from rocks_solid.power.ipmi import IPMIPower
+    from rocks_solid.power.sw import SWPower
 
     config = config_read('./rocks-solid.conf')
     #swpower = SWPower(config)

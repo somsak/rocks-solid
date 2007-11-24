@@ -4,13 +4,18 @@ IPMI Launcher
 '''
 import re, os, sys, string, popen2
 
-from rocks-solid import Launcher
+from rocks_solid import Launcher
 import rocks.pssh
 
 class ClusterIPMI(rocks.pssh.ClusterFork) :
     def __init__(self, argv, config) :
         rocks.pssh.ClusterFork.__init__(self, argv)
         self.ipmi = IPMI(config)
+        self.usage_name = 'Cluster IPMI'
+        self.usage_version = '1.0'
+
+    def usageTail(self) :
+        return ' IPMI command'
 
     def run(self, command=None):
 
@@ -123,8 +128,8 @@ class IPMI(object) :
         return output, error
 
 if __name__ == '__main__' :
-    from rocks.solid import rocks_hostlist
-    from rocks.solid import config_read
+    from rocks_solid import rocks_hostlist
+    from rocks_solid import config_read
 
     ipmi = IPMI(config_read('./rocks-solid.conf'))
     #print ipmi.gen_hostlist(rocks_hostlist())

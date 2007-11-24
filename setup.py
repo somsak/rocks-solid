@@ -29,7 +29,8 @@ setup(
     # metadata for upload to PyPI
     entry_points = {
         'console_scripts': [
-            'cluster-ipmi-sh = rocks.solid.app:run_cluster_ipmi',
+            'cluster-ipmi = rocks_solid.app:run_cluster_ipmi',
+            'cluster-power = rocks_solid.app:run_cluster_power',
         ]
     },
     author = "Somsak Sriprayoonsakul",
