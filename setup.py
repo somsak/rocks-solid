@@ -31,6 +31,9 @@ setup(
         'console_scripts': [
             'cluster-ipmi = rocks_solid.app:run_cluster_ipmi',
             'cluster-power = rocks_solid.app:run_cluster_power',
+            'node-cleanipcs = rocks_solid.app:run_node_cleanipcs',
+            'node-term-user-ps = rocks_solid.app:run_node_term_user_ps',
+            'node-term-sge-zombie = rocks_solid.app:run_node_term_sge_zombie',
         ]
     },
     author = "Somsak Sriprayoonsakul",
