@@ -2,7 +2,7 @@
 Software Power
 '''
 
-from rocks.solid.power import BasePower
+from rocks_solid.power import BasePower
 import popen2
 
 class SWPower(BasePower) :

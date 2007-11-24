@@ -137,6 +137,8 @@ def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     config = Config()
 
     config_parser = ConfigParser()
+    if os.environ.has_key('ROCKS_SOLID_CONF') :
+        file = os.environ['ROCKS_SOLID_CONF']
     config_parser.read(file)
 
     for sect in config_parser.sections() :
