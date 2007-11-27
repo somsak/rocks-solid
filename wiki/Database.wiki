@@ -1,0 +1,17 @@
+#database interface
+
+= Database Interface =
+
+Solid use database to log some of its activity. One of very importance thing is powersave log. This can later be used in monitoring tool.
+
+Solid currently use sqlalchemy to communicate with RDBMS. SQLite is preferred database.
+
+= Table Details =
+Table field
+ * ID (auto-increment)
+ * HostName (VARCHAR(255))
+ * OnTime (DateTime)
+ * OffTime (DateTime)
+ * DESC (TEXT)
+
+= Details =
