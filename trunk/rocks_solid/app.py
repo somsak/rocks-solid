@@ -27,17 +27,14 @@ def run_cluster_power() :
 def run_node_cleanipcs() :
     if len(sys.argv) >= 2 :
         if sys.argv[1] == '-h' :
-            print >> sys.stderr, 'Usage: %s [sem|shm] [user1] [user2] ...' % sys.argv[0]
+            print >> sys.stderr, 'Usage: %s [sem|shm]' % sys.argv[0]
             sys.exit(1)
         ipc_list = [sys.argv[1]]
+        assert sys.argv[1] in ['sem', 'shm']
     else :
         ipc_list = []
 
-    if len(sys.argv) >= 3 :
-        user_list = sys.argv[2:]
-    else :
-        user_list = []
-    cleanipcs(ipc_list, user_list)
+    cleanipcs(ipc_list)
 
 def run_node_term_user_ps() :
     if len(sys.argv) > 1 :

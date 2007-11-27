@@ -57,7 +57,10 @@ def term_sge_zombie(user_list = []) :
         pid_list = pid_list + pid2_list
         os.system('kill -s KILL ' + ' '.join(map(str, pid_list)))
 
-def cleanipcs(ipc_list = [], user_list = []) :
+def clean_ipcs(ipc_list = []) :
+    '''
+    Clean orphaned IPC
+    '''
     if not ipc_list :
         ipc_list = ['sem', 'shm']
     for ipc in ipc_list :
@@ -65,23 +68,22 @@ def cleanipcs(ipc_list = [], user_list = []) :
             ipc_opt = '-s'
         elif ipc == 'shm' :
             ipc_opt = '-m'
-        ipcs = os.popen('ipcs -c ' + ipc_opt)
+        ipcs = os.popen('ipcs -p ' + ipc_opt)
         id_list = []
         while 1 :
             line = ipcs.readline()
-            if not line : break
+            if not line :
+                break
             try :
                 int(line[0])
             except ValueError :
                 continue
             ipc_data = line.split()
-            uid = pwd.getpwnam(ipc_data[2])[2]
-            if uid < 500 or ipc_data[2] in known_system_users :
-                continue
-            if user_list :
-                if ipc_data[2] not in user_list :
-                    continue
-            id_list.append(ipc_data[0])
+            # get process information
+            pids = ipc_data[2:3]
+            for pid in pids :
+                if not os.path.exists('/proc/%s' % pid) :
+                    id_list.append(ipc_data[0])
         ipcs.close()
         if id_list :
             opt_str = ' ' + ipc_opt + ' '
