@@ -35,6 +35,7 @@ setup(
             'node-term-user-ps = rocks_solid.app:run_node_term_user_ps',
             'node-term-sge-zombie = rocks_solid.app:run_node_term_sge_zombie',
             'cluster-freehost = rocks_solid.app:run_cluster_freehost', 
+            'cluster-clean-ps = rocks_solid.app:run_cluster_clean_ps',
         ]
     },
     author = "Somsak Sriprayoonsakul",
