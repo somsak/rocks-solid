@@ -1,3 +1,4 @@
+# in case setuptools become default in RHEL
 #from setuptools import setup, find_packages
 import os, glob, sys
 from distutils.core import setup
@@ -10,17 +11,6 @@ def list_my_packages() :
             retval.append(os.path.join('rocks_solid', dir))
     return retval
 
-#    entry_points = {
-#        'console_scripts': [
-#            'cluster-ipmi = rocks_solid.app:run_cluster_ipmi',
-#            'cluster-power = rocks_solid.app:run_cluster_power',
-#            'node-cleanipcs = rocks_solid.app:run_node_cleanipcs',
-#            'node-term-user-ps = rocks_solid.app:run_node_term_user_ps',
-#            'node-term-sge-zombie = rocks_solid.app:run_node_term_sge_zombie',
-#            'cluster-freehost = rocks_solid.app:run_cluster_freehost', 
-#            'cluster-clean-ps = rocks_solid.app:run_cluster_clean_ps',
-#        ]
-#    },
 entry_points = [
     'cluster-ipmi = rocks_solid.app:run_cluster_ipmi',
     'cluster-power = rocks_solid.app:run_cluster_power',
