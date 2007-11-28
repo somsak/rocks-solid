@@ -11,7 +11,7 @@ from rocks_solid import module_factory
 class BasePower(object) :
     def __init__(self, config) :
         self.config = config
-        self.launcher = Launcher()
+        self.launcher = Launcher(ignore=config.power_ignore_host)
 
     def on(self, host_list) :
         pass

@@ -2,7 +2,7 @@
 Rocks-solid main function
 '''
 
-import os, pwd, popen2, string, sys, time
+import os, pwd, popen2, string, sys, time, re
 from StringIO import StringIO
 from ConfigParser import ConfigParser
 
@@ -57,7 +57,7 @@ def term_sge_zombie(user_list = []) :
         pid_list = pid_list + pid2_list
         os.system('kill -s KILL ' + ' '.join(map(str, pid_list)))
 
-def clean_ipcs(ipc_list = []) :
+def cleanipcs(ipc_list = []) :
     '''
     Clean orphaned IPC
     '''
@@ -128,6 +128,7 @@ class Config :
     ipmi_passwd = ''
     ipmi_intf = 'lanplus'
     db_uri = 'sqlite:///var/spool/rocks/power_control.db'
+    power_ignore_host = []
 
 def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     '''
@@ -149,14 +150,28 @@ def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
                     setattr(config, opt, config_parser.get('main', opt))
                 else :
                     setattr(config, sect + '_' + opt, config_parser.get(sect, opt))
+    if config.power_ignore_host :
+        config.power_ignore_host = config.power_ignore_host.split(',')
+        for i in range(len(config.power_ignore_host)) :
+            config.power_ignore_host[i] = re.compile(config.power_ignore_host[i])
 
     del config_parser
 
     return config
 
 class Launcher(object) :
+    def __init__(self, **kw) :
+        self.ignore = kw.get('ignore', [])
+
     def launch(self, host_list, func, more_arg = None, delay = 0) :
         for host in host_list :
+            skip = 0
+            for pattern in self.ignore :
+                if pattern.match(host) :
+                    skip = 1
+                    break
+            if skip :
+                continue
             if delay > 0:
                 time.sleep(delay)
             #elif delay == -1
