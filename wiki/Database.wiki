@@ -15,3 +15,6 @@ Table field
  * DESC (TEXT)
 
 = Details =
+ # Query data from database (uniq, distinct). Only node that has only "up" record.
+ # Synchronize with current list of online/offline hosts (update "down" on hosts that's down, leave the rest if the host already up)
+ # Add host that's not in the list into database, leave "down" empty
