@@ -145,3 +145,83 @@ def run_cluster_clean_ps() :
     except ImportError :
         parser.error('Unknown scheduler setting: %s' % config.scheduler)
         sys.exit(1)
+
+def run_cluster_powersave() :
+    from rocks_solid import config_read
+    from rocks_solid import module_factory
+
+    # query queue information
+    config = config_read()
+    try :
+        scheduler_mod = module_factory('rocks_solid.scheduler.%s' % config.scheduler)
+        scheduler = scheduler_mod.Scheduler()
+        # query queue information
+        queues = scheduler.queues()
+        queue_dict = {}
+        # look for free host and off line hosts for each queue
+        for queue in queues :
+            queue_dict[queue.name] = ([], queue.offline_hosts)
+            if not queue.online_hosts :
+                continue
+            for host in queue.online_hosts :
+                if (host.state == 'up') and (host.slot_used == 0) :
+                    queue_dict[queue.name][0].append(host)
+
+        if config.default_queue :
+            default_queue = config.default_queue
+        else :
+            # pick the first queue
+            default_queue = queues[0].name
+
+        for item in queue_dict.iteritems() :
+            print item[0], item[1]
+
+        # query job list information
+        job_list = scheduler.list()
+        i = 0
+        while i < len(job_list) :
+            if job_list[i].state == 'running' :
+                del job_list[i]
+            else :
+                if not job_list[i].queue :
+                    job_list[i].queue = default_queue
+                i = i + 1
+            
+#        for job in job_list :
+#            print job
+
+        # for each queue which has job pending, pick enough host for that queues
+        # decrease number of free host base on each job
+        poweron_hosts = {}
+        for job in job_list :
+            avail = queue_dict[job.queue].total - queue_dict[job.queue].used
+            # avail can less than used.
+            # if admin remove some hosts or some hosts are overloaded
+            if avail < 0 : 
+                avail = 0
+            picked = avail
+
+            for host in queue_dict[job.queue].offline_hosts :
+                if host.state != 'down' :
+                    continue
+                if not poweron_hosts.has_key(host) :
+                    poweron_hosts[host] = 1
+                    picked += 1
+                if picked > job.np :
+                    break
+            # it is possible that off line hosts is even not enough
+            # in that case the job would *still* stuck in wait
+            # while hosts are being powered on
+            # we can't do anything about that
+
+        # for each queue which has vacant nodes, pick all those vacant nodes
+        
+
+    # vacant nodes - power on nodes - min_spare. 
+    # power off ndoes
+    # power on nodes
+    except :
+        raise
+
+if __name__ == '__main__' :
+    run_cluster_powersave()
