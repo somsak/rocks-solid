@@ -1,0 +1,7 @@
+#features
+= Current features (in SVN) =
+
+ * cluster-ipmi
+ * cluster-power - power on/shut down the node *properly*
+ * cluster-clean-ps - clear all orphaned process left by MPI. This happened loads of time with Amber9. It'll clear all user processes which has init as its parent. User processes should owned by sge_sphered or sshd.
+ * cluster-freehost - so I can answer my boss *How many nodes idle right now?*. We have many queues and "qstat -g c" couldn't give us correct information. This command look for the real *idle node* by looking at used slot and current load average.
