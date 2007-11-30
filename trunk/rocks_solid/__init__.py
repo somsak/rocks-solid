@@ -129,6 +129,7 @@ class Config :
     ipmi_intf = 'lanplus'
     db_uri = 'sqlite:///var/spool/rocks/power_control.db'
     power_ignore_host = []
+    default_queue = ''
 
 def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     '''

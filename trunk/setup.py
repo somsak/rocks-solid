@@ -19,6 +19,7 @@ entry_points = [
     'node-term-sge-zombie = rocks_solid.app:run_node_term_sge_zombie',
     'cluster-freehost = rocks_solid.app:run_cluster_freehost', 
     'cluster-clean-ps = rocks_solid.app:run_cluster_clean_ps',
+    'cluster-powersave = rocks_solid.app:run_cluster_powersave',
 ]
 
 scripts = []
