@@ -85,9 +85,9 @@ class ClusterPower(rocks.pssh.ClusterFork) :
             self.help()
             sys.exit(1)
 
-        print args[0]
-        print nodelist
-        #eval("self.power['%s'].%s(nodelist)" % (args[0], args[0]))
+#        print args[0]
+#        print nodelist
+        eval("self.power['%s'].%s(nodelist)" % (args[0], args[0]))
 
 if __name__ == '__main__' :
     import sys
