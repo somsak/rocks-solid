@@ -264,5 +264,10 @@ def run_cluster_powersave() :
     except :
         raise
 
+def run_envcheck() :
+    from rocks_solid import config_read
+
+
+
 if __name__ == '__main__' :
     run_cluster_powersave()
