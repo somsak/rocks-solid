@@ -20,6 +20,7 @@ entry_points = [
     'cluster-freehost = rocks_solid.app:run_cluster_freehost', 
     'cluster-clean-ps = rocks_solid.app:run_cluster_clean_ps',
     'cluster-powersave = rocks_solid.app:run_cluster_powersave',
+    'node-envcheck = rocks_solid.app:run_node_envcheck',
 ]
 
 scripts = []
