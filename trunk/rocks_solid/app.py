@@ -165,6 +165,7 @@ def run_cluster_powersave() :
         all_offline_hosts = {}
         # look for free host and off line hosts for each queue
         for queue in queues :
+            #print '******* %s *******' % queue.name
             queue_dict[queue.name] = ([], queue.offline_hosts)
             if queue.offline_hosts :
                 for host in queue.offline_hosts :
@@ -172,16 +173,22 @@ def run_cluster_powersave() :
             if not queue.online_hosts :
                 continue
             for host in queue.online_hosts :
+#                if host.name == 'compute-4-11.local' :
+#                    print host
                 if host.slot_used <= 0 :
                     queue_dict[queue.name][0].append(host)
                     if not all_free_hosts.has_key(host.name) :
+#                        print 'adding %s' % host.name
                         all_free_hosts[host.name] = host
-                elif all_free_hosts.has_key(host.name)  :
+                else :
+#                    print 'removing %s' % host.name
                     all_free_hosts[host.name] = None
-
         for key in all_free_hosts.keys() :
-            if all_free_hosts[key] is None :
+            if not all_free_hosts[key] :
                 del all_free_hosts[key]
+
+#        for key, value in all_free_hosts.iteritems() :
+#            print value
 
         if config.default_queue :
             default_queue = config.default_queue
@@ -212,27 +219,11 @@ def run_cluster_powersave() :
         poweroff_hosts = []
         for job in job_list :
             while job.np > 0 :
-#                if queue_dict[job.queue][0] :
-#                    # hosts still available
-#                    host = queue_dict[job.queue][0][0]
-#                    if all_free_hosts.has_key(host.name) :
-#                        job.np -= (host.slot_total - host.slot_used)
-#                        del all_free_hosts[host.name]
-#                    del queue_dict[job.queue][0][0]
-#                elif queue_dict[job.queue][1] :
-#                    # hosts is not available
-#                    # pick some off line hosts
-#                    host = queue_dict[job.queue][1][0]
-#                    if all_offline_hosts.has_key(host.name) :
-#                        job.np -= host.slot_total
-#                        del all_offline_hosts[host.name]
-#                    # list of host to power on
-#                    poweron_hosts.append(host)
-#                elif all_free_hosts :
-#                    # randomly pick hosts from free hosts
-#                    name, host = all_free_hosts.popitem()
-#                    job.np -= (host.slot_total - host.slot_used)
-#                elif all_offline_hosts :
+                # we deal only with off line hosts here
+                # there's no simple way to imitate resource
+                # selection of underlying scheduler
+                # we'll randomly pick any off line hosts
+                # until the job is run
                 if all_offline_hosts :
                     # randomly pick hosts from offline hosts
                     name, host = all_offline_hosts.popitem()
@@ -250,6 +241,7 @@ def run_cluster_powersave() :
         if not job_list :
             # all free hosts that's left, power it down!
             poweroff_hosts = all_free_hosts.keys()
+            #print poweroff_hosts
             # vacant nodes - power off nodes - min_spare. 
             if len(poweroff_hosts) > config.power_min_spare :
                 poweroff_hosts = poweroff_hosts[config.power_min_spare:]

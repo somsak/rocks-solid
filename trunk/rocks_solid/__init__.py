@@ -2,7 +2,7 @@
 Rocks-solid main function
 '''
 
-import os, pwd, popen2, string, sys, time, re
+import os, pwd, popen2, string, sys, time, re, types
 from StringIO import StringIO
 from ConfigParser import ConfigParser
 
@@ -138,12 +138,16 @@ def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     @rtype configuration object
     @return configuration object
     '''
-    config = Config()
-
     config_parser = ConfigParser()
     if os.environ.has_key('ROCKS_SOLID_CONF') :
         file = os.environ['ROCKS_SOLID_CONF']
     config_parser.read(file)
+
+    stat_data = os.stat(file)
+    if stat_data.st_mode & 0077 :
+        raise IOError('wrong permission of %s, must not be world-readable' % file)
+
+    config = Config()
 
     for sect in config_parser.sections() :
             for opt in config_parser.options(sect) :
@@ -155,6 +159,9 @@ def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
         config.power_ignore_host = config.power_ignore_host.split(',')
         for i in range(len(config.power_ignore_host)) :
             config.power_ignore_host[i] = re.compile(config.power_ignore_host[i])
+
+    if type(config.power_min_spare) != types.IntType :
+        config.power_min_spare = int(config.power_min_spare)
 
     del config_parser
 
