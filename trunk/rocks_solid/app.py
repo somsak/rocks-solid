@@ -149,6 +149,7 @@ def run_cluster_clean_ps() :
 def run_cluster_powersave() :
     from rocks_solid import config_read
     from rocks_solid import module_factory
+    from rocks_solid.power import ClusterPower
 
     # query queue information
     config = config_read()
@@ -157,15 +158,30 @@ def run_cluster_powersave() :
         scheduler = scheduler_mod.Scheduler()
         # query queue information
         queues = scheduler.queues()
+        # queue_dict hold 'locally free' host
         queue_dict = {}
+        # all_free_hosts hold 'globally free' host
+        all_free_hosts = {}
+        all_offline_hosts = {}
         # look for free host and off line hosts for each queue
         for queue in queues :
             queue_dict[queue.name] = ([], queue.offline_hosts)
+            if queue.offline_hosts :
+                for host in queue.offline_hosts :
+                    all_offline_hosts[host.name] = host
             if not queue.online_hosts :
                 continue
             for host in queue.online_hosts :
-                if (host.state == 'up') and (host.slot_used == 0) :
+                if host.slot_used <= 0 :
                     queue_dict[queue.name][0].append(host)
+                    if not all_free_hosts.has_key(host.name) :
+                        all_free_hosts[host.name] = host
+                elif all_free_hosts.has_key(host.name)  :
+                    all_free_hosts[host.name] = None
+
+        for key in all_free_hosts.keys() :
+            if all_free_hosts[key] is None :
+                del all_free_hosts[key]
 
         if config.default_queue :
             default_queue = config.default_queue
@@ -173,8 +189,8 @@ def run_cluster_powersave() :
             # pick the first queue
             default_queue = queues[0].name
 
-        for item in queue_dict.iteritems() :
-            print item[0], item[1]
+#        for item in queue_dict.iteritems() :
+#            print item[0], item[1]
 
         # query job list information
         job_list = scheduler.list()
@@ -192,34 +208,67 @@ def run_cluster_powersave() :
 
         # for each queue which has job pending, pick enough host for that queues
         # decrease number of free host base on each job
-        poweron_hosts = {}
+        poweron_hosts = []
+        poweroff_hosts = []
         for job in job_list :
-            avail = queue_dict[job.queue].total - queue_dict[job.queue].used
-            # avail can less than used.
-            # if admin remove some hosts or some hosts are overloaded
-            if avail < 0 : 
-                avail = 0
-            picked = avail
-
-            for host in queue_dict[job.queue].offline_hosts :
-                if host.state != 'down' :
-                    continue
-                if not poweron_hosts.has_key(host) :
-                    poweron_hosts[host] = 1
-                    picked += 1
-                if picked > job.np :
+            while job.np > 0 :
+#                if queue_dict[job.queue][0] :
+#                    # hosts still available
+#                    host = queue_dict[job.queue][0][0]
+#                    if all_free_hosts.has_key(host.name) :
+#                        job.np -= (host.slot_total - host.slot_used)
+#                        del all_free_hosts[host.name]
+#                    del queue_dict[job.queue][0][0]
+#                elif queue_dict[job.queue][1] :
+#                    # hosts is not available
+#                    # pick some off line hosts
+#                    host = queue_dict[job.queue][1][0]
+#                    if all_offline_hosts.has_key(host.name) :
+#                        job.np -= host.slot_total
+#                        del all_offline_hosts[host.name]
+#                    # list of host to power on
+#                    poweron_hosts.append(host)
+#                elif all_free_hosts :
+#                    # randomly pick hosts from free hosts
+#                    name, host = all_free_hosts.popitem()
+#                    job.np -= (host.slot_total - host.slot_used)
+#                elif all_offline_hosts :
+                if all_offline_hosts :
+                    # randomly pick hosts from offline hosts
+                    name, host = all_offline_hosts.popitem()
+                    job.np -= host.slot_total
+                    poweron_hosts.append(host)
+                else :
+                    # no hosts left!
+                    # break immediately
                     break
-            # it is possible that off line hosts is even not enough
+            # it is possible that off line hosts is not enough
             # in that case the job would *still* stuck in wait
             # while hosts are being powered on
             # we can't do anything about that
+        # only power down if there's no waiting job
+        if not job_list :
+            # all free hosts that's left, power it down!
+            poweroff_hosts = all_free_hosts.keys()
+            # vacant nodes - power off nodes - min_spare. 
+            if len(poweroff_hosts) > config.power_min_spare :
+                poweroff_hosts = poweroff_hosts[config.power_min_spare:]
+            else :
+                poweroff_hosts = []
 
-        # for each queue which has vacant nodes, pick all those vacant nodes
-        
+#            print len(poweroff_hosts)
+#            print poweroff_hosts
+#            print poweron_hosts
 
-    # vacant nodes - power on nodes - min_spare. 
-    # power off ndoes
-    # power on nodes
+            # power off ndoes
+            power = ClusterPower(None, config)
+            if poweroff_hosts :
+                power.nodes = poweroff_hosts
+                power.run(command=['off'])
+            # power on nodes
+            if poweron_hosts :
+                power.nodes = poweron_hosts
+                power.run(command=['on'])
     except :
         raise
 

@@ -2,7 +2,7 @@
 Power controller
 '''
 
-import popen2, sys
+import popen2, sys, string
 
 import rocks.pssh
 from rocks_solid import Launcher
@@ -73,16 +73,21 @@ class ClusterPower(rocks.pssh.ClusterFork) :
             for host, in self.cursor.fetchall():
                 nodelist.append(host)
 
-        args = self.getArgs()
-        if not args :
-            self.help()
-            sys.exit(1)
+        if not command :
+            args = self.getArgs()
+            if not args :
+                self.help()
+                sys.exit(1)
+        else :
+            args = command
 
         if (len(args) > 1) or not args[0] in ['on', 'off', 'reset', 'status'] :
             self.help()
             sys.exit(1)
 
-        eval("self.power['%s'].%s(nodelist)" % (args[0], args[0]))
+        print args[0]
+        print nodelist
+        #eval("self.power['%s'].%s(nodelist)" % (args[0], args[0]))
 
 if __name__ == '__main__' :
     import sys
