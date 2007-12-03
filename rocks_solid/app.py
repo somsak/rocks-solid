@@ -267,7 +267,28 @@ def run_cluster_powersave() :
 def run_envcheck() :
     from rocks_solid import config_read
 
+    config = config_read()
+    checkers_cf = config.env_sensor.split(',')
+    checkers = []
+    for c in checkers_cf :
+        m = module_factory('rocks_solid.env.%s' % c)
+        checkers.append(m.Checker(config))
+    action_cf = config.env_action
+    m = module_factory('rocks_solid.env.%s' % action_cf)
+    action = m.Action(config)
+    all_retval = []
+    for checker in checkers :
+        retval = checker.check()
 
+        if retval != 0 :
+            if config.env_criteria == 'any' :
+                action.act()
+                break
+            else :
+                all_retval.append(retval)
+    if all_retval :
+        if not 0 in all_retval :
+            action.act()
 
 if __name__ == '__main__' :
     run_cluster_powersave()
