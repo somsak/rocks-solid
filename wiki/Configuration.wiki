@@ -17,19 +17,34 @@ powersave=/var/spool/rocks/powersave_control.db
 
 [ipmi]
 host_pattern=s/compute/compute-ilo/
+#host_pattern=/tmp/gen_host %s
 user=admin
-password=xxxxxx
+passwd=TgridiLOAdmin
 
 [ssh]
 shutdown_cmd=/sbin/poweroff
+reboot_cmd=/sbin/reboot
+arg=-f
 
 [power]
 min_spare=5
-ignore_host=compute-0-7,compute-4-.*
+ignore_host=compute-ilo-4-1.*
+
+[temp]
+thereshold=35
+ipmi_attr=.*Amb.*Temp.*
+ipmi_attr1=.*Temp.*2.*
+
+[env]
+sensor=temp
+criteria=any
+action=shutdown
 
 [main]
 poweron_driver=ipmi
 poweroff_driver=sw
+powerreset_driver=sw
+powerstatus_driver=ipmi
 scheduler=sge
-
+default_queue=long.q
 }}}
