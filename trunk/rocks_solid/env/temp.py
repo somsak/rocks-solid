@@ -33,7 +33,7 @@ class TempChecker(BaseChecker) :
 #                print r.pattern
                 if r.match(name) :
                     value = fields[len(fields) - 1].strip()
-                    if config.verbose :
+                    if self.config.verbose :
                         print 'IPMI temperature = %s' % value
                     try :
                         temp = int(value.split()[0])
@@ -52,14 +52,14 @@ class TempChecker(BaseChecker) :
                     f.close()
                     m = acpi_re.match(line)
                     if m :
-                        if config.verbose :
+                        if self.config.verbose :
                             print 'ACPI temperature = %s' % line
                         temp = int(m.group('temp'))
                         break
             except :
                 pass
 
-        if config.verbose :
+        if self.config.verbose :
             print 'Temperature = %s' % temp
         # what next? maybe lm_sensor?
         if temp is None :
