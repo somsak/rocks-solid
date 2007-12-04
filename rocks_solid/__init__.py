@@ -165,6 +165,9 @@ def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     if type(config.power_min_spare) != types.IntType :
         config.power_min_spare = int(config.power_min_spare)
 
+    if type(config.temp_thereshold) != types.IntType :
+        config.temp_thereshold = int(config.temp_thereshold)
+
     del config_parser
 
     return config
