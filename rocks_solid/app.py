@@ -293,9 +293,10 @@ def log_date(file) :
     f.write(time.asctime() + '\n')
     f.close()
 
-def run_envcheck() :
+def run_node_envcheck() :
     import optparse
     from rocks_solid import config_read
+    from rocks_solid import module_factory
 
     parser = optparse.OptionParser()
     parser.add_option('-d', '--dryrun', dest='dryrun', action="store_true",
