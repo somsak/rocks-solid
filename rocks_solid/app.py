@@ -147,9 +147,19 @@ def run_cluster_clean_ps() :
         sys.exit(1)
 
 def run_cluster_powersave() :
+    import optparse
     from rocks_solid import config_read
     from rocks_solid import module_factory
     from rocks_solid.power import ClusterPower
+
+
+    parser = optparse.OptionParser()
+    parser.add_option('-d', '--dryrun', dest='dryrun', action="store_true",
+        help="just test, no action taken")
+    parser.add_option('-v', '--verbose', dest='verbose', action="store_true",
+        help="verbose output")
+
+    options, args = parser.parse_args()
 
     # query queue information
     config = config_read()
@@ -256,11 +266,17 @@ def run_cluster_powersave() :
             power = ClusterPower(None, config)
             if poweroff_hosts :
                 power.nodes = poweroff_hosts
-                power.run(command=['off'])
+                if not options.dryrun :
+                    power.run(command=['off'])
+                else :
+                    print 'power down %s' % poweroff_hosts
             # power on nodes
             if poweron_hosts :
                 power.nodes = poweron_hosts
-                power.run(command=['on'])
+                if not options.dryrun :
+                    power.run(command=['on'])
+                else :
+                    print 'power on %s' % poweroff_hosts
     except :
         raise
 
@@ -277,8 +293,9 @@ def run_envcheck() :
 
     parser = optparse.OptionParser()
     parser.add_option('-d', '--dryrun', dest='dryrun', action="store_true",
-        help="Just test, no action taken")
+        help="just test, no action taken")
     parser.add_option('-v', '--verbose', dest='verbose', action="store_true",
+        help="verbose output")
 
     options, args = parser.parse_args()
     config = config_read()
@@ -302,7 +319,7 @@ def run_envcheck() :
             print 'return value of %s = %d' % (checker[1], retval)
         if retval != 0 :
             if config.env_criteria == 'any' :
-                if not options.dryrun
+                if not options.dryrun :
                     log_date(log)
                     action.act()
                 break
@@ -310,7 +327,7 @@ def run_envcheck() :
                 all_retval.append(retval)
     if all_retval :
         if not 0 in all_retval :
-            if not options.dryrun
+            if not options.dryrun :
                 log_date(log)
                 action.act()
 

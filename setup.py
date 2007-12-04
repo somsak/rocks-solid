@@ -9,6 +9,7 @@ def list_my_packages() :
         path = os.path.join('rocks_solid', dir)
         if os.path.isdir(path) and (dir != '.svn') and (dir != 'CVS') :
             retval.append(os.path.join('rocks_solid', dir))
+    print retval
     return retval
 
 entry_points = [
