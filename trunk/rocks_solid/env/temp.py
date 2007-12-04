@@ -68,5 +68,5 @@ Checker = TempChecker
 if __name__ == '__main__' :
     from rocks_solid import config_read
 
-    t = TempChecker(config_read())
+    t = TempChecker(config_read(), verbose=1)
     print t.check()
