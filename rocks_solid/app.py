@@ -280,6 +280,8 @@ def run_node_envcheck() :
     config = config_read()
     if options.verbose :
         setattr(config, 'verbose', True)
+    else :
+        setattr(config, 'verbose', False)
     try :
         log = config.env_log
     except :

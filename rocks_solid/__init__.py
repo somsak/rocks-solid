@@ -141,6 +141,8 @@ def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     config_parser = ConfigParser()
     if os.environ.has_key('ROCKS_SOLID_CONF') :
         file = os.environ['ROCKS_SOLID_CONF']
+    if not os.access(file, os.R_OK) :
+        raise IOError('can not access config file %s' % file)
     config_parser.read(file)
 
     stat_data = os.stat(file)
