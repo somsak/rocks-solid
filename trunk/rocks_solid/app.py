@@ -264,31 +264,55 @@ def run_cluster_powersave() :
     except :
         raise
 
+def log_date(file) :
+    import time
+
+    f = open(file, 'w')
+    f.write(time.asctime() + '\n')
+    f.close()
+
 def run_envcheck() :
+    import optparse
     from rocks_solid import config_read
 
+    parser = optparse.OptionParser()
+    parser.add_option('-d', '--dryrun', dest='dryrun', action="store_true",
+        help="Just test, no action taken")
+    parser.add_option('-v', '--verbose', dest='verbose', action="store_true",
+
+    options, args = parser.parse_args()
     config = config_read()
+    try :
+        log = config.env_log
+    except :
+        log = '/var/log/node-envcheck.log'
     checkers_cf = config.env_sensor.split(',')
     checkers = []
     for c in checkers_cf :
         m = module_factory('rocks_solid.env.%s' % c)
-        checkers.append(m.Checker(config))
+        checkers.append( (m.Checker(config), c))
     action_cf = config.env_action
     m = module_factory('rocks_solid.env.%s' % action_cf)
     action = m.Action(config)
     all_retval = []
     for checker in checkers :
-        retval = checker.check()
+        retval = checker[0].check()
 
+        if options.verbose :
+            print 'return value of %s = %d' % (checker[1], retval)
         if retval != 0 :
             if config.env_criteria == 'any' :
-                action.act()
+                if not options.dryrun
+                    log_date(log)
+                    action.act()
                 break
             else :
                 all_retval.append(retval)
     if all_retval :
         if not 0 in all_retval :
-            action.act()
+            if not options.dryrun
+                log_date(log)
+                action.act()
 
 if __name__ == '__main__' :
     run_cluster_powersave()
