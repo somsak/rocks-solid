@@ -227,6 +227,9 @@ def run_cluster_powersave() :
         # decrease number of free host base on each job
         poweron_hosts = []
         poweroff_hosts = []
+        if options.verbose :
+            print '***** all offline hosts *****' 
+            print all_offline_hosts
         for job in job_list :
             while job.np > 0 :
                 # we deal only with off line hosts here
@@ -237,6 +240,9 @@ def run_cluster_powersave() :
                 if all_offline_hosts :
                     # randomly pick hosts from offline hosts
                     name, host = all_offline_hosts.popitem()
+                    if options.verbose :
+                        print 'select %s, %s' % (name, host)
+                        print name, host
                     job.np -= host.slot_total
                     poweron_hosts.append(host)
                 else :
@@ -248,6 +254,7 @@ def run_cluster_powersave() :
             # while hosts are being powered on
             # we can't do anything about that
         # only power down if there's no waiting job
+        power = ClusterPower(None, config)
         if not job_list :
             # all free hosts that's left, power it down!
             poweroff_hosts = all_free_hosts.keys()
@@ -263,7 +270,6 @@ def run_cluster_powersave() :
 #            print poweron_hosts
 
             # power off ndoes
-            power = ClusterPower(None, config)
             if poweroff_hosts :
                 power.nodes = poweroff_hosts
                 if not options.dryrun :
@@ -271,12 +277,12 @@ def run_cluster_powersave() :
                 else :
                     print 'power down %s' % poweroff_hosts
             # power on nodes
-            if poweron_hosts :
-                power.nodes = poweron_hosts
-                if not options.dryrun :
-                    power.run(command=['on'])
-                else :
-                    print 'power on %s' % poweroff_hosts
+        if poweron_hosts :
+            power.nodes = poweron_hosts
+            if not options.dryrun :
+                power.run(command=['on'])
+            else :
+                print 'power on %s' % poweron_hosts
     except :
         raise
 
