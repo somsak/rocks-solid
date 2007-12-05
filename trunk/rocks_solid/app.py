@@ -243,14 +243,21 @@ def run_cluster_powersave() :
 
             # power off ndoes
             if poweroff_hosts :
-                power.nodes = poweroff_hosts
+                name_list = []
+                for host in poweroff_hosts :
+                    name_list.append(host.name)
+                power.nodes = name_list
                 if not options.dryrun :
                     power.run(command=['off'])
                 else :
                     print 'power down %s' % poweroff_hosts
             # power on nodes
         if poweron_hosts :
-            power.nodes = poweron_hosts
+            name_list = []
+            for host in poweron_hosts :
+                name_list.append(host.name)
+            power.nodes = name_list
+
             if not options.dryrun :
                 power.run(command=['on'])
             else :
