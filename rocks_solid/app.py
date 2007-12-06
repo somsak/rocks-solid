@@ -216,7 +216,7 @@ def run_cluster_powersave() :
                         print 'select %s, %s' % (name, host)
                         print name, host
                     job.np -= host.slot_total
-                    poweron_hosts.append(host)
+                    poweron_hosts.append(host.name)
                 else :
                     # no hosts left!
                     # break immediately
@@ -243,21 +243,14 @@ def run_cluster_powersave() :
 
             # power off ndoes
             if poweroff_hosts :
-                name_list = []
-                for host in poweroff_hosts :
-                    name_list.append(host.name)
-                power.nodes = name_list
+                power.nodes = poweroff_hosts
                 if not options.dryrun :
                     power.run(command=['off'])
                 else :
                     print 'power down %s' % poweroff_hosts
             # power on nodes
         if poweron_hosts :
-            name_list = []
-            for host in poweron_hosts :
-                name_list.append(host.name)
-            power.nodes = name_list
-
+            power.nodes = poweron_hosts
             if not options.dryrun :
                 power.run(command=['on'])
             else :
