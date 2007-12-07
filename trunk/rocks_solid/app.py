@@ -8,7 +8,10 @@ def run_cluster_ipmi() :
     import rocks_solid.ipmi
     from rocks_solid import config_read
 
-    app = rocks_solid.ipmi.ClusterIPMI(sys.argv, config_read())
+    config = config_read()
+    # never ignore hosts
+    config.power_ignore_host = []
+    app = rocks_solid.ipmi.ClusterIPMI(sys.argv, config)
     app.parseArgs()
     app.run()
 
@@ -17,7 +20,10 @@ def run_cluster_power() :
     import rocks_solid.power
     from rocks_solid import config_read
 
-    app = rocks_solid.power.ClusterPower(sys.argv, config_read())
+    config = config_read()
+    # never ignore hosts
+    config.power_ignore_host = []
+    app = rocks_solid.power.ClusterPower(sys.argv, config)
     app.parseArgs()
     app.run()
 
