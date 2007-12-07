@@ -1,7 +1,6 @@
 '''
 IPMI Power Controller
 '''
-from rocks_solid import Launcher
 from rocks_solid.ipmi import IPMI
 from rocks_solid.power import BasePower
 
