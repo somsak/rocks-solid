@@ -126,10 +126,9 @@ def run_cluster_clean_ps() :
 
 def run_cluster_powersave() :
     import optparse
-    from rocks_solid import config_read
+    from rocks_solid import config_read, check_ignore
     from rocks_solid import module_factory
     from rocks_solid.power import ClusterPower
-
 
     parser = optparse.OptionParser()
     parser.add_option('-d', '--dryrun', dest='dryrun', action="store_true",
@@ -157,7 +156,8 @@ def run_cluster_powersave() :
             queue_dict[queue.name] = ([], queue.offline_hosts)
             if queue.offline_hosts :
                 for host in queue.offline_hosts :
-                    all_offline_hosts[host.name] = host
+                    if not check_ignore(host.name, config.power_ignore_host) :
+                        all_offline_hosts[host.name] = host
             if not queue.online_hosts :
                 continue
             for host in queue.online_hosts :
@@ -167,16 +167,20 @@ def run_cluster_powersave() :
                     queue_dict[queue.name][0].append(host)
                     if not all_free_hosts.has_key(host.name) :
 #                        print 'adding %s' % host.name
-                        all_free_hosts[host.name] = host
+                        if not check_ignore(host.name, config.power_ignore_host) :
+                            all_free_hosts[host.name] = host
                 else :
 #                    print 'removing %s' % host.name
-                    all_free_hosts[host.name] = None
+                    if not check_ignore(host.name, config.power_ignore_host) :
+                        all_free_hosts[host.name] = None
         for key in all_free_hosts.keys() :
             if not all_free_hosts[key] :
                 del all_free_hosts[key]
 
-#        for key, value in all_free_hosts.iteritems() :
-#            print value
+        if options.verbose :
+            print '******* All on-line and free hosts *******'
+            for key in all_free_hosts.iterkeys() :
+                print key
 
         if config.default_queue :
             default_queue = config.default_queue
@@ -184,8 +188,9 @@ def run_cluster_powersave() :
             # pick the first queue
             default_queue = queues[0].name
 
-#        for item in queue_dict.iteritems() :
-#            print item[0], item[1]
+#        if options.verbose :
+#            for item in queue_dict.iteritems() :
+#                print item[0], item[1]
 
         # query job list information
         job_list = scheduler.list()
