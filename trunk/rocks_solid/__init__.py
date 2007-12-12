@@ -131,6 +131,22 @@ class Config :
     power_ignore_host = []
     default_queue = ''
 
+def check_ignore(host_name, pattern_list) :
+    '''
+    Check for each host name against pattern list
+
+    @type host_name string
+    @param host_name host name to check
+    @type pattern_list list of compiled RE
+    @param pattern_list list of pattern to check
+    @rtype boolean
+    @return True if matched, otherwise false
+    '''
+    for ent in pattern_list :
+        if ent.match(host_name) :
+            return True
+    return False
+
 def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     '''
     Read configuration file and return configuration object
