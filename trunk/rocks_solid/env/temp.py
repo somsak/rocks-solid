@@ -4,6 +4,7 @@ Environmental temperature checker
 import re, os
 
 acpi_re = re.compile(r'temperature:\s*(?P<temp>[0-9]).*', re.IGNORECASE)
+hddtemp_re = re.compile(r'.*?(?P<temp>[0-9]+).*', re.IGNORECASE | re.DOTALL)
 
 from rocks_solid.env import BaseChecker
 
@@ -22,7 +23,7 @@ class TempChecker(BaseChecker) :
     def check(self) :
         temp = None
         # IPMI first
-        ipmi_cmd= os.popen('ipmitool -I open sdr type temperature', 'r')
+        ipmi_cmd= os.popen('ipmitool -I open sdr type temperature 2> /dev/null', 'r')
         while 1 :
             line = ipmi_cmd.readline()
             if not line: break
@@ -56,6 +57,29 @@ class TempChecker(BaseChecker) :
                             print 'ACPI temperature = %s' % line
                         temp = int(m.group('temp'))
                         break
+            except :
+                pass
+
+        # HDDTemp
+        if temp is None :
+            try :
+                try :
+                    hddtemp = config.env_hddtemp
+                    drive = config.env_hddtemp_arg
+                except :
+                    hddtemp = '/usr/sbin/hddtemp'
+                    drive = '/dev/sda'
+                
+                cmd = os.popen('%s %s' % (hddtemp, drive), 'r')
+                output = cmd.read().strip()
+                temp_str = output.split(':')[2]
+                if self.config.verbose :
+                    print 'HDDTemp output = %s' % output
+                    print 'Temperature string = %s' % temp_str             
+                m = hddtemp_re.match(temp_str)
+                if m :
+                    temp = int(m.group('temp'))
+                cmd.close()
             except :
                 pass
 
