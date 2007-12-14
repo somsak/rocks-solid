@@ -69,4 +69,7 @@ class DB(object) :
 
 if __name__ == '__main__' :
     import os
-    db = DB(url='sqlite://%s/test.db' % os.getcwd(), verbose=True)
+    db_path = 'sqlite://%s/test.db' % os.getcwd()
+    db_path = 'sqlite:///:memory:'
+    print db_path
+    db = DB(url=db_path, verbose=True)
