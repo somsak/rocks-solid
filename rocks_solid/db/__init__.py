@@ -8,6 +8,7 @@ from datetime import datetime
 from sqlalchemy import create_engine
 from sqlalchemy import Table, Column, Integer, String, DateTime, MetaData, ForeignKey   
 from sqlalchemy.orm import mapper, sessionmaker
+from sqlalchemy.sql import and_, or_, not_
 
 metadata = MetaData()
 
@@ -54,18 +55,6 @@ class DB(object) :
         self.verbose = kw.get('verbose', False)
         self.engine = create_engine(self.db_url, echo=self.verbose)
         self.init_db()
-        self.Session = sessionmaker(bind=self.engine, autoflush=True, transactional=True)
-        self._session = None
-
-    def get_session(self) :
-        if not self._session :
-            self._session = self.Session()
-        return self._session
-
-    def set_session(self, session) :
-        self._session = session
-
-    session = property(get_session, set_session) 
 
     def init_db(self) :
         '''
@@ -80,35 +69,42 @@ class DB(object) :
         @type host_list list of string
         @param host_list list of host name
         '''
+        Session = sessionmaker(bind=self.engine, autoflush=True, transactional=True)
+        session = Session()
         # query for any host entry with 'off' record
-        result = self.session.query(HostActivity).filter(HostActivity.off_time == None)
+        result = session.query(HostActivity).filter(HostActivity.off_time == None)
+        # put host that's still in host_list into database
         # build offline hosts
         # in case we miss something (host downed by administrative request)
         now = datetime.today()
-        for host_acct in result :
-            if host_acct.name not in host_list :
-                host_acct.off_time = now
-                self.session.save(host_acct)
+        for host_act in result :
+            if host_act.name not in host_list :
+                host_act.off_time = now
+                host_acct.off_comment = 'off detected'
+                #print host_act.name
+                #session.save(host_act)
+            else :
+                host_list.remove(host_act.name)
         # build new on-line hosts
-        print result
         for host in host_list :
-            if host not in result :
-                self.session.save(HostActivity(name=host, on_time=now, on_comment='on detected'))
-        # put host that's still in host_list into database
-        self.session.commit()
+            session.save(HostActivity(name=host, on_time=now, on_comment='on detected'))
+        session.commit()
 
-    def update_off_hosts(self, host_list, state) :
+    def update_off_hosts(self, host_list) :
         '''
-        Update list of hosts (assume hosts is already in db) with state
+        Update off_time in list of hosts (assume hosts is already in db) 
         '''
-        pass
+        # update all entry each host in host_list, set off_time
+        conn = self.engine.connect()
+        for host in host_list :
+            conn.execute(host_activity.update(and_(host_activity.c.name == host, host_activity.c.off_time == None)), off_time = datetime.now())
 
 if __name__ == '__main__' :
     import os
-    db_path = 'sqlite:///%s/test.sqlite' % os.getcwd()
     db_path = 'sqlite:///%s/test.sqlite' % '/tmp'
     #db_path = 'sqlite:///:memory:'
-    db_path = 'mysql://stat:1q2w3e4r@localhost/node_status'
+    #db_path = 'mysql://stat:1q2w3e4r@localhost/node_status'
     print db_path
     db = DB(url=db_path, verbose=True)
-    db.insert_on_hosts(['compute-0-0.local', 'compute-0-1.local'])
+    db.insert_on_hosts(['compute-0-1.local', 'compute-0-2.local', 'compute-0-3.local'])
+    db.update_off_hosts(['compute-0-1.local', 'compute-0-4.local'])
