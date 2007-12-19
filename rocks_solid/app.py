@@ -163,7 +163,7 @@ def run_cluster_powersave() :
             for host in queue.online_hosts :
 #                if host.name == 'compute-4-11.local' :
 #                    print host
-                if host.slot_used <= 0 :
+                if (host.slot_used <= 0) and (host.loadavg < 0.2):
                     queue_dict[queue.name][0].append(host)
                     if not all_free_hosts.has_key(host.name) :
 #                        print 'adding %s' % host.name
