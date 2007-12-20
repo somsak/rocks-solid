@@ -129,6 +129,7 @@ def run_cluster_powersave() :
     from rocks_solid import config_read, check_ignore
     from rocks_solid import module_factory
     from rocks_solid.power import ClusterPower
+    from rocks_solid.db import DB
 
     parser = optparse.OptionParser()
     parser.add_option('-d', '--dryrun', dest='dryrun', action="store_true",
@@ -163,7 +164,7 @@ def run_cluster_powersave() :
             for host in queue.online_hosts :
 #                if host.name == 'compute-4-11.local' :
 #                    print host
-                if (host.slot_used <= 0) and (host.loadavg < 0.2):
+                if (host.slot_used <= 0) and (host.loadavg < config.power_loadavg):
                     queue_dict[queue.name][0].append(host)
                     if not all_free_hosts.has_key(host.name) :
 #                        print 'adding %s' % host.name
