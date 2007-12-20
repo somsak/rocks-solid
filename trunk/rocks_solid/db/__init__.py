@@ -90,14 +90,17 @@ class DB(object) :
             session.save(HostActivity(name=host, on_time=now, on_comment='on detected'))
         session.commit()
 
-    def update_off_hosts(self, host_list) :
+    def update_hosts(self, host_list, state = 'off') :
         '''
         Update off_time in list of hosts (assume hosts is already in db) 
         '''
         # update all entry each host in host_list, set off_time
         conn = self.engine.connect()
         for host in host_list :
-            conn.execute(host_activity.update(and_(host_activity.c.name == host, host_activity.c.off_time == None)), off_time = datetime.now())
+            if state == 'off' :
+                conn.execute(host_activity.update(and_(host_activity.c.name == host, host_activity.c.off_time == None)), off_time = datetime.now())
+            else :
+                conn.execute(host_activity.insert(values={'name':host, 'on_time':datetime.now()}))
 
 if __name__ == '__main__' :
     import os
@@ -107,4 +110,5 @@ if __name__ == '__main__' :
     print db_path
     db = DB(url=db_path, verbose=True)
     db.insert_on_hosts(['compute-0-1.local', 'compute-0-2.local', 'compute-0-3.local'])
-    db.update_off_hosts(['compute-0-1.local', 'compute-0-4.local'])
+    db.update_hosts(['compute-0-1.local', 'compute-0-4.local'], 'off')
+    db.update_hosts(['compute-0-5.local'], 'on')

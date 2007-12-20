@@ -131,22 +131,7 @@ class Config :
     power_ignore_host = []
     default_queue = ''
     power_loadavg = 0.2
-
-def check_ignore(host_name, pattern_list) :
-    '''
-    Check for each host name against pattern list
-
-    @type host_name string
-    @param host_name host name to check
-    @type pattern_list list of compiled RE
-    @param pattern_list list of pattern to check
-    @rtype boolean
-    @return True if matched, otherwise false
-    '''
-    for ent in pattern_list :
-        if ent.match(host_name) :
-            return True
-    return False
+    power_db = 'sqlite:////var/tmp/host_activity.sqlite'
 
 def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     '''
@@ -191,6 +176,22 @@ def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     del config_parser
 
     return config
+
+def check_ignore(host_name, pattern_list) :
+    '''
+    Check for each host name against pattern list
+
+    @type host_name string
+    @param host_name host name to check
+    @type pattern_list list of compiled RE
+    @param pattern_list list of pattern to check
+    @rtype boolean
+    @return True if matched, otherwise false
+    '''
+    for ent in pattern_list :
+        if ent.match(host_name) :
+            return True
+    return False
 
 class Launcher(object) :
     def __init__(self, **kw) :

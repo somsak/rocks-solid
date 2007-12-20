@@ -129,7 +129,7 @@ def run_cluster_powersave() :
     from rocks_solid import config_read, check_ignore
     from rocks_solid import module_factory
     from rocks_solid.power import ClusterPower
-#    from rocks_solid.db import DB
+    from rocks_solid.db import DB
 
     parser = optparse.OptionParser()
     parser.add_option('-d', '--dryrun', dest='dryrun', action="store_true",
@@ -141,6 +141,9 @@ def run_cluster_powersave() :
 
     # query queue information
     config = config_read()
+
+    # initializa host activity database
+    db = DB(url = config.power_db, verbose = options.verbose)
     try :
         scheduler_mod = module_factory('rocks_solid.scheduler.%s' % config.scheduler)
         scheduler = scheduler_mod.Scheduler()
@@ -151,6 +154,7 @@ def run_cluster_powersave() :
         # all_free_hosts hold 'globally free' host
         all_free_hosts = {}
         all_offline_hosts = {}
+        all_online_hosts = {}
         # look for free host and off line hosts for each queue
         for queue in queues :
             #print '******* %s *******' % queue.name
@@ -164,6 +168,7 @@ def run_cluster_powersave() :
             for host in queue.online_hosts :
 #                if host.name == 'compute-4-11.local' :
 #                    print host
+                all_online_hosts[host.name] = 1
                 if (host.slot_used <= 0) and (host.loadavg < config.power_loadavg):
                     queue_dict[queue.name][0].append(host)
                     if not all_free_hosts.has_key(host.name) :
@@ -182,6 +187,8 @@ def run_cluster_powersave() :
             print '******* All on-line and free hosts *******'
             for key in all_free_hosts.iterkeys() :
                 print key
+
+        db.insert_on_hosts(all_online_hosts.keys())
 
         if config.default_queue :
             default_queue = config.default_queue
@@ -255,6 +262,7 @@ def run_cluster_powersave() :
 
             # power off ndoes
             if poweroff_hosts :
+                db.update_hosts(poweroff_hosts, 'off')
                 power.nodes = poweroff_hosts
                 if not options.dryrun :
                     power.run(command=['off'])
@@ -262,6 +270,7 @@ def run_cluster_powersave() :
                     print 'power down %s' % poweroff_hosts
             # power on nodes
         if poweron_hosts :
+            db.update_hosts(poweron_hosts, 'on')
             power.nodes = poweron_hosts
             if not options.dryrun :
                 power.run(command=['on'])
