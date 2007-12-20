@@ -130,6 +130,7 @@ class Config :
     db_uri = 'sqlite:///var/spool/rocks/power_control.db'
     power_ignore_host = []
     default_queue = ''
+    power_loadavg = 0.2
 
 def check_ignore(host_name, pattern_list) :
     '''
@@ -183,6 +184,9 @@ def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
 
     if type(config.temp_thereshold) != types.IntType :
         config.temp_thereshold = int(config.temp_thereshold)
+
+    if type(config.power_loadavg) != types.FloaType :
+        config.power_loadavg = float(config.power_loadavg)
 
     del config_parser
 
