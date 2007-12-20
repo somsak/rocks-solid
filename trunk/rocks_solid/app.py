@@ -129,7 +129,7 @@ def run_cluster_powersave() :
     from rocks_solid import config_read, check_ignore
     from rocks_solid import module_factory
     from rocks_solid.power import ClusterPower
-    from rocks_solid.db import DB
+#    from rocks_solid.db import DB
 
     parser = optparse.OptionParser()
     parser.add_option('-d', '--dryrun', dest='dryrun', action="store_true",
