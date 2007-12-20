@@ -185,7 +185,7 @@ def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     if type(config.temp_thereshold) != types.IntType :
         config.temp_thereshold = int(config.temp_thereshold)
 
-    if type(config.power_loadavg) != types.FloaType :
+    if type(config.power_loadavg) != types.FloatType :
         config.power_loadavg = float(config.power_loadavg)
 
     del config_parser
