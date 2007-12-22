@@ -5,6 +5,7 @@ Rocks-solid main function
 import os, pwd, popen2, string, sys, time, re, types
 from StringIO import StringIO
 from ConfigParser import ConfigParser
+from threading import Thread, Condition
 
 known_system_users = ['fluent', 'accelrys', 'maya', 'autodesk', 'alias']
 
@@ -196,8 +197,36 @@ def check_ignore(host_name, pattern_list) :
 class Launcher(object) :
     def __init__(self, **kw) :
         self.ignore = kw.get('ignore', [])
+        self.condition = None
+        self.num_thread = 0
+        self.count_thread = 0
+        self.output = {}
+        self.thread_list = {}
 
-    def launch(self, host_list, func, more_arg = None, delay = 0) :
+    def thread_run(self, launcher, func, args) :
+        try :
+            output, error = func(*args)
+        except :
+            import traceback
+            print >> sys.stderr, 'Host %s error!' % args[0]
+            traceback.print_exc()
+
+        launcher.condition.acquire()
+        try :
+            launcher.count_thread = launcher.count_thread - 1
+            launcher.output[args[0]] = (output, error)
+        except :
+            pass
+        launcher.condition.notify()
+        launcher.condition.release()
+
+    def launch(self, host_list, func, more_arg = None, delay = 0, num_thread = 10) :
+        if delay < 0 :
+            self.num_thread = num_thread
+            self.condition = Condition()
+            self.count_thread = 0
+            self.condition.acquire()
+
         for host in host_list :
             skip = 0
             for pattern in self.ignore :
@@ -206,21 +235,42 @@ class Launcher(object) :
                     break
             if skip :
                 continue
-            if delay > 0:
-                time.sleep(delay)
-            #elif delay == -1
-            #   do background
             if more_arg :
-                output, error = func(host, *more_arg)
+                args = [host] + more_arg
             else :
-                output, error = func(host)
-            for o in output, error :
-                soutput = StringIO(o)
-                while 1 :
-                    line = soutput.readline()
-                    if not line : break
-                    sys.stdout.write(host.split('.')[0][:20] + ':\t' + line)
-                soutput.close()
+                args = [host]
+
+            if delay >= 0:
+                time.sleep(delay)
+                output, error = func(*args)
+                self.print_output(host, output, error)
+            elif delay < 0 :
+                while self.output :
+                    key, value = self.output.popitem()
+                    self.print_output(key, value[0], value[1])
+                t = Thread(target = self.thread_run, args = (self, func, args))
+                t.start()
+                self.count_thread = self.count_thread + 1
+                if self.count_thread >= self.num_thread :
+                    self.condition.wait()
+        if delay < 0 :
+            while self.count_thread > 0 :
+                while self.output :
+                    key, value = self.output.popitem()
+                    self.print_output(key, value[0], value[1])
+                self.condition.wait()
+            self.condition.release()
+            self.condition = None
+            self.count_thread = 0
+                    
+    def print_output(self, host, output, error) :
+        for o in output, error :
+            soutput = StringIO(o)
+            while 1 :
+                line = soutput.readline().strip()
+                if not line : break
+                sys.stdout.write(host.split('.')[0][:20] + ':\t' + line + '\n')
+            soutput.close()
 
 if __name__  == '__main__' :
     c = config_read('./rocks-solid.conf')

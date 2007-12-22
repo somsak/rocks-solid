@@ -2,7 +2,7 @@
 Power controller
 '''
 
-import popen2, sys, string
+import sys, string, os
 
 import rocks.pssh
 from rocks_solid import Launcher
@@ -12,6 +12,13 @@ class BasePower(object) :
     def __init__(self, config) :
         self.config = config
         self.launcher = Launcher(ignore=config.power_ignore_host)
+
+    def ping(self, host) :
+        exit_stat = os.system('ping -c1 -w1 %s > /dev/null 2>&1' % host)
+        if os.WIFEXITED(exit_stat) and os.WEXITSTATUS(exit_stat) == 0 :
+            return True
+        else :
+            return False
 
     def on(self, host_list) :
         pass

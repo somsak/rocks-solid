@@ -2,7 +2,7 @@
 '''
 IPMI Launcher
 '''
-import re, os, sys, string, popen2
+import re, os, sys, string
 
 from rocks_solid import Launcher
 import rocks.pssh
@@ -116,12 +116,13 @@ class IPMI(object) :
         @type args list of string
         @param args IPMI command
         '''
-        if os.system('ping -c1 -w1 %s > /dev/null 2>&1' % host) == 0 :
+        exit_stat = os.system('ping -c1 -w1 %s > /dev/null 2>&1' % host)
+        if os.WIFEXITED(exit_stat) and os.WEXITSTATUS(exit_stat) == 0 :
             cmdline = 'ipmitool ' + self.ipmi_arg % host + args
-            cmd = popen2.Popen4(cmdline)
-            output = cmd.fromchild.read()
+            cmd = os.popen(cmdline, 'r')
+            output = cmd.read()
             error = ''
-            cmd.wait()
+            cmd.close()
         else :
             output = ''
             error = 'down'

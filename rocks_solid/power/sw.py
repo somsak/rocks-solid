@@ -11,6 +11,8 @@ class SWPower(BasePower) :
     This driver basically do not support power on
     '''
     def ssh_shutdown(self, host) :
+        if not self.ping(host) :
+            return '', 'down'
         cmdline = 'ssh %s %s "%s" && echo shutdown %s' % (self.config.ssh_arg, host, self.config.ssh_shutdown_cmd, host)
         cmd = popen2.Popen3(cmdline, capturestderr = True)
         output = cmd.fromchild.read()
@@ -19,9 +21,11 @@ class SWPower(BasePower) :
         return output, error
 
     def off(self, host_list) :
-        self.launcher.launch(host_list, self.ssh_shutdown)
+        self.launcher.launch(host_list, self.ssh_shutdown, delay = -1)
 
     def ssh_reboot(self, host) :
+        if not self.ping(host) :
+            return '', 'down'
         cmdline = 'ssh %s %s "%s" && echo reboot %s' % (self.config.ssh_arg, host, self.config.ssh_reboot_cmd, host)
         cmd = popen2.Popen3(cmdline, capturestderr = True)
         output = cmd.fromchild.read()
@@ -30,7 +34,7 @@ class SWPower(BasePower) :
         return output, error
 
     def reset(self, host_list) :
-        self.launcher.launch(host_list, self.ssh_reboot)
+        self.launcher.launch(host_list, self.ssh_reboot, delay = -1)
 
 Power = SWPower
 

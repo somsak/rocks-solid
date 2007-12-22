@@ -70,16 +70,17 @@ class TempChecker(BaseChecker) :
                     hddtemp = '/usr/sbin/hddtemp'
                     drive = '/dev/sda'
                 
-                cmd = os.popen('%s %s' % (hddtemp, drive), 'r')
-                output = cmd.read().strip()
-                temp_str = output.split(':')[2]
-                if self.config.verbose :
-                    print 'HDDTemp output = %s' % output
-                    print 'Temperature string = %s' % temp_str             
-                m = hddtemp_re.match(temp_str)
-                if m :
-                    temp = int(m.group('temp'))
-                cmd.close()
+                if os.access(hddtemp, os.X_OK) :
+                    cmd = os.popen('%s %s' % (hddtemp, drive), 'r')
+                    output = cmd.read().strip()
+                    temp_str = output.split(':')[2]
+                    if self.config.verbose :
+                        print 'HDDTemp output = %s' % output
+                        print 'Temperature string = %s' % temp_str             
+                    m = hddtemp_re.match(temp_str)
+                    if m :
+                        temp = int(m.group('temp'))
+                    cmd.close()
             except :
                 pass
 
