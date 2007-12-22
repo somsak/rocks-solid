@@ -80,7 +80,7 @@ class DB(object) :
         for host_act in result :
             if host_act.name not in host_list :
                 host_act.off_time = now
-                host_acct.off_comment = 'off detected'
+                host_act.off_comment = 'off detected'
                 #print host_act.name
                 #session.save(host_act)
             else :
@@ -98,9 +98,9 @@ class DB(object) :
         conn = self.engine.connect()
         for host in host_list :
             if state == 'off' :
-                conn.execute(host_activity.update(and_(host_activity.c.name == host, host_activity.c.off_time == None)), off_time = datetime.now())
+                conn.execute(host_activity.update(and_(host_activity.c.name == host, host_activity.c.off_time == None)), off_time = datetime.now(), off_comment = 'manual off')
             else :
-                conn.execute(host_activity.insert(values={'name':host, 'on_time':datetime.now()}))
+                conn.execute(host_activity.insert(values={'name':host, 'on_time':datetime.now(), 'on_comment':'manual on'}))
 
 if __name__ == '__main__' :
     import os
