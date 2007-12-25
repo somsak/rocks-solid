@@ -1,0 +1,19 @@
+#feature-plan
+
+= 0.5 =
+  * cluster-shutdown command supported
+   * support for user specified shutdown step
+   * quick/normal step
+  * reconfigurable number of thread in rocks-solid.conf
+
+= 0.1-0.4 =
+  * Initial release
+  * cluster-powersave able to utilize cluster using ssh/ipmi/wol using simple algorithm
+  * cluster-power support ssh/ipmi/wol
+  * cluster-ipmi works for most command
+  * node-clean-ipcs works on per node
+  * node-term-user-ps terminates all user processes
+  * cluster-clean-ps clean orphaned process
+  * cluster-freehost can check for free host
+  * node-term-sge-zombie terminates all SGE orphaned process (called by cluster-clean-ps)
+  * multi-thread invocation support
