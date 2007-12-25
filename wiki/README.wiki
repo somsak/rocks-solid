@@ -1,3 +1,4 @@
+#labels Featured
 #a readme of rocks-solid
 
 = Introduction =
@@ -23,11 +24,29 @@ Rocks-solid comes in RPM form, which is the common package management for ROCKS.
   # Install Rocks-solid
    # <download rocks-solid RPM>
    # `rpm -Uvh rocks-solid**.rpm`
+  # Install rocks-solid on all compute nodes. Please follow the step [http://www.rocksclusters.org/rocks-documentation/4.3/customization-adding-packages.html here]. (It is recommended to install all dependencies, although it is not needed for now.) 
   # create configuration file /etc/rocks-solid.conf. Please follow example [http://code.google.com/p/rocks-solid/wiki/Configuration here]
+  # If you plan to run node-envcheck, please distribute /etc/rocks-solid.conf to all compute nodes. This can be done using [http://www.rocksclusters.org/rocks-documentation/4.3/service-411.html ROCKS 411 services].
   # cluster-powersave need to operate by crond. So please put an entry in /etc/cron.d/powersave like this to instruct cluster-powersave to run every 5 minutes.
 {{{
 */5 * * * *     root     /opt/rocks/bin/cluster-powersave >& /dev/null
 }}}
+  # node-envcheck need to operate by crond. So please put an entry in /etc/cron.d/envcheck like this to instruct node-envcheck to run every 5 minutes.
+{{{
+*/5 * * * *     root     /opt/rocks/bin/node-envcheck >& /dev/null
+}}}
 
 = Command manual =
+Most 'cluster-' command here has the same syntax as cluster-fork. You can use '--nodes compute-0-%d:1-15' form
+
   * *cluster-powersave* - this command examine the current job queued in cluster. More information about how it choose the node can be found [http://code.google.com/p/rocks-solid/wiki/PowerSaveAlgorithm here]
+   * Example: cluster-powersave -d -v (run powersave in verbose and dry-run mode)
+  * *cluster-power* - power on/off and check status of each compute nodes.
+   * Example: cluster-power on (power on nodes)
+   * Example: cluster-power --nodes compute-1-%d:0-39 status (check for power status of nodes)
+  * *cluster-ipmi* - issue IPMI command to compute nodes
+   * Example: cluster-ipmi sdr type temperature (issue "sdr type temperature" on all compute-nodes)
+  * *cluster-freehost* - report all currently free hosts (no slot used)
+  * *cluster-clean-ps* - terminate all orphaned processes in compute nodes which are. 
+   * not owned by sge_sphered (not started by SGE)
+   * not owned by SSHD (not started by MPICH)
