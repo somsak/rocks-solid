@@ -1,50 +1,73 @@
-configuration file
-= Design =
- * Work from cron
- * A script, called "cluster-powersave" is run every 5 minutes.
-  * get_require_host()
-   # Sum-up number of needed cpu
-   # Sum-up number of free nodes
-   # If #1 + #2 is < min_spare, round up to min_spare
-   # return #3
-  * wakeup_host() with returned value of get_require_host
+#configuration file
 = Configuration =
 /etc/rocks-solid.conf
 {{{
-[db]
-uri=sqlite
-powersave=/var/spool/rocks/powersave_control.db
-
 [ipmi]
+# how to translate from normal host to IPMI host name
+# substitute 'compute' with 'compoute-ilo'
 host_pattern=s/compute/compute-ilo/
+# it is possible to use external command to translate the name.
+# however, it is much slower
 #host_pattern=/tmp/gen_host %s
+# user name of IPMI lan interface
 user=admin
-passwd=TgridiLOAdmin
+# password of IPMI lan IPMI user
+passwd=MyIPMIPassword
 
 [ssh]
+# command for cluster-power sw module to shutdown compute nodes
 shutdown_cmd=/sbin/poweroff
+# command for cluster-power sw module to reboot compute nodes
 reboot_cmd=/sbin/reboot
+# special argument for SSH command
 arg=-f
 
 [power]
-min_spare=5
-ignore_host=compute-ilo-4-1.*
+# minimum node to spare when cluster-powersave power off node
+min_spare=0
+# instruct cluster-powersave to ignore these host.
+# Host can be specified in regular expression
+# The format is regex1,regex2,regex3. 
+ignore_host=compute-4-.*,compute-0-.*,compute-2-.*
+# Maximum load average to consider the host is free
+loadavg=0.8
+# Where cluster-powersave keep the database of on/off records
+db=sqlite:////var/tmp/host_activity.sqlite
 
 [temp]
-thereshold=35
+# thereshold for node-envcheck, temperature module
+thereshold=40
+# attribute to look for, in case of IPMI-base temperature sensor
 ipmi_attr=.*Amb.*Temp.*
+# You can specify many attribute in order.
+# It'll use the first match
 ipmi_attr1=.*Temp.*2.*
 
 [env]
+# module to detect environmental abnormally
+# format is mod1,mod2,mod3 (although we only have temp for now)
 sensor=temp
+# match any sensor
 criteria=any
+# action if sensor detected abnormal environment
 action=shutdown
+# log file if anomally detected
+log=/var/log/node-envcheck.log
 
 [main]
+# driver to use to power on node (ipmi, wol)
 poweron_driver=ipmi
+# driver to use to power off noe (ipmi, sw)
+# Should always be sw here
+# for IPMI, it'll forcefully power down node immediately
 poweroff_driver=sw
+# driver for power reset (ipmi, sw)
+# Should always be sw here
+# for IPMI, it'll forcefully reset node immediately
 powerreset_driver=sw
+# driver to check for node status (ipmi, sw)
+# for sw, it'll just ping the node
 powerstatus_driver=ipmi
+# current scheduling system run in system (only SGE supported for now)
 scheduler=sge
-default_queue=long.q
 }}}
