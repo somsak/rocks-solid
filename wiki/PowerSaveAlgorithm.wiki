@@ -1,0 +1,33 @@
+#describe the current approach of cluster-powersave command
+
+= cluster-powersave algorithm =
+At first, I tried to imitate node-selection algorithm of SGE by just looking at the queue of each job. However, I found that it's quite hard to determine the queue for each job since job queue is determine automatically by SGE. Not to mention how to make this portable to other queuing system. Also, it's costly to peek the hard-queue-list resource requirement of each job. It's encoded deep down in each job information, which can not be parsed easily by just qstat, thus result in much longer time needed to just get queue statistics.
+
+So I decided to make it simple and easy. Right now the approach to power on and power off node is determine in the following step.
+{{{
+            [start]
+               |
+               |
+               v
+  [fetch queue status and on-line/off-line node list]
+               |
+               |
+               v 
+  [If there is any job queued] -yes--> [power on n off-line node: n == core needed by job] 
+               |                                             |
+               no                                            |
+               |                                             |
+               v                                             |
+  [check free (slot==0) node and power it down]              |
+               |                                             |
+               +---------------------------------------------+
+               |
+               v
+             [end]
+}}}
+
+So in case there's any job queued. _No node will be powered down at all._
+
+So in case there's job(s) queued. The node will be powered on until the job is being run.
+
+Off course there's the starvation problem here. If there's a job queued but the job can not run on any free-node, available at the time, due to some resource constrain or anything. cluster-powersave will just trying to power on more nodes until the job can run.  _If all nodes already on, cluster-powersave will do noting at all even if there're some free nodes_.
