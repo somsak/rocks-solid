@@ -29,13 +29,18 @@ Rocks-solid comes in RPM form, which is the common package management for ROCKS.
   # Install rocks-solid on all compute nodes. Please follow the step [http://www.rocksclusters.org/rocks-documentation/4.3/customization-adding-packages.html here]. (It is recommended to install all dependencies, although it is not needed for now.) 
   # create configuration file /etc/rocks-solid.conf. Please follow example [http://code.google.com/p/rocks-solid/wiki/Configuration here]
   # If you plan to run node-envcheck, please distribute /etc/rocks-solid.conf to all compute nodes. This can be done using [http://www.rocksclusters.org/rocks-documentation/4.3/service-411.html ROCKS 411 services].
-  # cluster-powersave need to operate by crond. So please put an entry in /etc/cron.d/powersave like this to instruct cluster-powersave to run every 5 minutes.
+  # cluster-powersave need to operate by crond. So please put an entry in /etc/cron.d/powersave like this to instruct cluster-powersave to run every 5 minutes. You need to put specific environment needed by SGE on top of crond script
 {{{
+env | grep ^SGE > /etc/cron.d/powersave
+cat >> /etc/cron.d/powersave << EOF
 */5 * * * *     root     /opt/rocks/bin/cluster-powersave >& /dev/null
+EOF
 }}}
   # node-envcheck need to operate by crond. So please put an entry in /etc/cron.d/envcheck like this to instruct node-envcheck to run every 5 minutes.
 {{{
+cat >> /etc/cron.d/envcheck << EOF
 */5 * * * *     root     /opt/rocks/bin/node-envcheck >& /dev/null
+EOF
 }}}
 
 = Command manual =
