@@ -23,8 +23,11 @@ Rocks-solid comes in RPM form, which is the common package management for ROCKS.
   # Install Rocks-solid
    # <download rocks-solid RPM>
    # `rpm -Uvh rocks-solid**.rpm`
-  # cluster-powersave need to operate under crond. 
-
+  # create configuration file /etc/rocks-solid.conf. Please follow example [http://code.google.com/p/rocks-solid/wiki/Configuration here]
+  # cluster-powersave need to operate by crond. So please put an entry in /etc/cron.d/powersave like this to instruct cluster-powersave to run every 5 minutes.
+{{{
+*/5 * * * *     root     /opt/rocks/bin/cluster-powersave >& /dev/null
+}}}
 
 = Command manual =
   * *cluster-powersave* - this command examine the current job queued in cluster. More information about how it choose the node can be found [http://code.google.com/p/rocks-solid/wiki/PowerSaveAlgorithm here]
