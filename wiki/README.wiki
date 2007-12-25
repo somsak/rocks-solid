@@ -3,7 +3,9 @@
 
 = Introduction =
 
-Rocks-Solid is a set of tools that enhance the use of [http://www.rocksclusters.org ROCKS cluster]. Most of the tools intent to help ROCKS cluster administrator. Brief of features are
+Rocks-Solid is a set of tools that enhance the use of [http://www.rocksclusters.org ROCKS cluster]. Most of the tools intent to help ROCKS cluster administrator.
+
+Brief of features are
 
   * Energy consumption optimizer base on queue usage, by power on/off nodes dynamically.
   * IPMI management tools
