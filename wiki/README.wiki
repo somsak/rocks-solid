@@ -1,0 +1,30 @@
+#a readme of rocks-solid
+
+= Introduction =
+
+Rocks-Solid is a set of tools that enhance the use of [http://www.rocksclusters.org ROCKS cluster]. Most of the tools intent to help ROCKS cluster administrator. Brief of features are
+
+  * Energy consumption optimizer base on queue usage, by power on/off nodes dynamically.
+  * IPMI management tools
+  * Node power management
+  * Node status checker & shutdown tools
+  * Miscellaneous tools
+   * Command to terminate all orphaned job in compute nodes
+   * Terminate all user processes
+   * Clean up unused IPCS
+
+Current release support only ROCKS 4.x, tested heavily only on ROCKS 4.2.1 and ROCKS 4.1. It should also works on ROCKS 4.3.
+
+= Installation = 
+Rocks-solid comes in RPM form, which is the common package management for ROCKS. To instal Rocks-solid.
+  # Download all dependencies and install them.
+   # <download all foundation** RPMs here>
+   # `rpm -Uvh foundation-**.rpm`
+  # Install Rocks-solid
+   # <download rocks-solid RPM>
+   # `rpm -Uvh rocks-solid**.rpm`
+  # cluster-powersave need to operate under crond. 
+
+
+= Command manual =
+  * *cluster-powersave* - this command examine the current job queued in cluster. More information about how it choose the node can be found [http://code.google.com/p/rocks-solid/wiki/PowerSaveAlgorithm here]
