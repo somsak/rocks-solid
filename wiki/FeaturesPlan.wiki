@@ -1,5 +1,7 @@
 #labels Phase-Design
 #feature-plan
+= 0.6 =
+  * Node-selection algorithm (base on electrical phase) for cluster-powersave
 
 = 0.5 =
   * cluster-shutdown command supported
