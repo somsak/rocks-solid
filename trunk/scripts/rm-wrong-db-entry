@@ -1,0 +1,27 @@
+#!/opt/rocks/bin/python
+
+from datetime import datetime, MINYEAR
+
+from sqlalchemy import create_engine
+from sqlalchemy import Table, Column, Integer, String, DateTime, MetaData, ForeignKey   
+from sqlalchemy.orm import mapper, sessionmaker
+from sqlalchemy.sql.expression import and_, or_, not_
+from sqlalchemy import select, func
+
+from rocks_solid.db import host_activity
+from rocks_solid import config_read
+
+config = config_read()
+engine = create_engine(config.power_db, echo=True)
+conn = engine.connect()
+
+conn.begin()
+clause = and_(host_activity.c.on_comment == 'manual on', host_activity.c.off_comment == 'off detected',
+    (host_activity.c.off_time - host_activity.c.on_time).label('difftime') <= datetime(1900, 1, 1, 0, 6, 0, 0))
+result = conn.execute( host_activity.delete(clause) )
+row = result.fetchone()
+while row :
+    print row
+    row = result.fetchone()
+conn.close()
+
