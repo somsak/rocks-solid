@@ -34,7 +34,7 @@ def run_node_cleanipcs() :
     parser = optparse.OptionParser(usage='%prog [sem|shm]')
     options, args = parser.parse_args()
     if len(args) > 0 :
-        ipc_list = args[0]
+        ipc_list = [args[0]]
         assert args[0] in ['sem', 'shm']
     else :
         ipc_list = []
