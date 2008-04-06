@@ -3,6 +3,8 @@
 Application file
 '''
 
+powersave_ignore_file = '/var/tmp/powersave_ignore'
+
 def run_cluster_ipmi() :
     import sys
     import rocks_solid.ipmi
@@ -144,6 +146,10 @@ def run_cluster_powersave() :
 
     # initializa host activity database
     db = DB(url = config.power_db, verbose = options.verbose)
+
+    # do we need to ignore everything? 
+    if os.path.exists(powersave_ignore_file) :
+        sys.exit(1)
     try :
         scheduler_mod = module_factory('rocks_solid.scheduler.%s' % config.scheduler)
         scheduler = scheduler_mod.Scheduler()
