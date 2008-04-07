@@ -149,8 +149,9 @@ def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     config_parser.read(file)
 
     stat_data = os.stat(file)
-    if stat_data.st_mode & 0077 :
-        raise IOError('wrong permission of %s, must not be world-readable' % file)
+# remove since WOL and SW don't need this kind of strict permission
+#    if stat_data.st_mode & 0077 :
+#        raise IOError('wrong permission of %s, must not be world-readable' % file)
 
     config = Config()
 
