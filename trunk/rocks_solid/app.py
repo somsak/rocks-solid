@@ -91,6 +91,8 @@ def run_cluster_freehost() :
             online_hosts_dict[host.name] = 1
         queues = scheduler.queues()
         for q in queues :
+            if not q.online_hosts :
+                continue
             for host in q.online_hosts :
                 if host.slot_used > 0:
                     try :
