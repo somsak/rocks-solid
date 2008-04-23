@@ -179,7 +179,7 @@ def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
 
     return config
 
-def check_ignore(host_name, pattern_list) :
+def check_ignore(host_name, pattern_list, verbose = False) :
     '''
     Check for each host name against pattern list
 
@@ -192,6 +192,8 @@ def check_ignore(host_name, pattern_list) :
     '''
     for ent in pattern_list :
         if ent.match(host_name) :
+            if verbose :
+                print >> sys.stderr, 'pattern %s match %s' % (ent.pattern, host_name)
             return True
     return False
 

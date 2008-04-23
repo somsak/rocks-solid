@@ -136,9 +136,9 @@ def run_cluster_powersave() :
     from rocks_solid.db import DB
 
     parser = optparse.OptionParser()
-    parser.add_option('-d', '--dryrun', dest='dryrun', action="store_true",
+    parser.add_option('-d', '--dryrun', dest='dryrun', action="store_true", default=False,
         help="just test, no action taken")
-    parser.add_option('-v', '--verbose', dest='verbose', action="store_true",
+    parser.add_option('-v', '--verbose', dest='verbose', action="store_true", default=False,
         help="verbose output")
 
     options, args = parser.parse_args()
@@ -196,7 +196,8 @@ def run_cluster_powersave() :
             for key in all_free_hosts.iterkeys() :
                 print key
 
-        db.insert_on_hosts(all_online_hosts.keys())
+        if not options.dryrun :
+            db.insert_on_hosts(all_online_hosts.keys())
 
         if config.default_queue :
             default_queue = config.default_queue
@@ -270,17 +271,17 @@ def run_cluster_powersave() :
 
             # power off ndoes
             if poweroff_hosts :
-                db.update_hosts(poweroff_hosts, 'off')
                 power.nodes = poweroff_hosts
                 if not options.dryrun :
+                    db.update_hosts(poweroff_hosts, 'off')
                     power.run(command=['off'])
                 else :
                     print 'power down %s' % poweroff_hosts
             # power on nodes
         if poweron_hosts :
-            db.update_hosts(poweron_hosts, 'on')
             power.nodes = poweron_hosts
             if not options.dryrun :
+                db.update_hosts(poweron_hosts, 'on')
                 power.run(command=['on'])
             else :
                 print 'power on %s' % poweron_hosts
@@ -302,7 +303,7 @@ def run_node_envcheck() :
     parser = optparse.OptionParser()
     parser.add_option('-d', '--dryrun', dest='dryrun', action="store_true",
         help="just test, no action taken")
-    parser.add_option('-v', '--verbose', dest='verbose', action="store_true",
+    parser.add_option('-v', '--verbose', dest='verbose', action="store_true", default=False,
         help="verbose output")
 
     options, args = parser.parse_args()
@@ -342,6 +343,22 @@ def run_node_envcheck() :
             if not options.dryrun :
                 log_date(log)
                 action.act()
+
+def run_check_ignore_host() :
+    import optparse
+    from rocks_solid import config_read, check_ignore
+    from rocks_solid import module_factory
+
+    parser = optparse.OptionParser()
+    parser.add_option('-c', '--config', dest='config', 
+        help="path to configuration file")
+    parser.add_option('-v', '--verbose', dest='verbose', action="store_true", default=False,
+        help="verbose output")
+
+    options, args = parser.parse_args()
+    config = config_read()
+    for arg in args :
+        print 'checking %s = %d' % (arg, check_ignore(arg, config.power_ignore_host, options.verbose))
 
 if __name__ == '__main__' :
     run_cluster_powersave()
