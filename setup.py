@@ -21,6 +21,7 @@ entry_points = [
     'cluster-clean-ps = rocks_solid.app:run_cluster_clean_ps',
     'cluster-powersave = rocks_solid.app:run_cluster_powersave',
     'node-envcheck = rocks_solid.app:run_node_envcheck',
+    'check-ignore-host = rocks_solid.app:run_check_ignore_host',
 ]
 
 scripts = []
