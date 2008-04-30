@@ -216,7 +216,6 @@ class Launcher(object) :
 
         launcher.condition.acquire()
         try :
-            launcher.count_thread = launcher.count_thread - 1
             launcher.output[args[0]] = (output, error)
         except :
             pass
@@ -251,9 +250,10 @@ class Launcher(object) :
                 while self.output :
                     key, value = self.output.popitem()
                     self.print_output(key, value[0], value[1])
+                    self.count_thread -= 1
                 t = Thread(target = self.thread_run, args = (self, func, args))
                 t.start()
-                self.count_thread = self.count_thread + 1
+                self.count_thread += 1
                 if self.count_thread >= self.num_thread :
                     self.condition.wait()
         if delay < 0 :
@@ -261,10 +261,12 @@ class Launcher(object) :
                 while self.output :
                     key, value = self.output.popitem()
                     self.print_output(key, value[0], value[1])
-                self.condition.wait()
+                    self.count_thread -= 1
+                if self.count_thread > 0 :
+                    self.condition.wait()
             self.condition.release()
-            self.condition = None
             self.count_thread = 0
+            self.condition = None
                     
     def print_output(self, host, output, error) :
         for o in output, error :
