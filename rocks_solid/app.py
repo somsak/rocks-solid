@@ -361,5 +361,46 @@ def run_check_ignore_host() :
     for arg in args :
         print 'checking %s = %d' % (arg, check_ignore(arg, config.power_ignore_host, options.verbose))
 
+def run_queue_limit_user_cpu() :
+    '''
+    Terminate any job exceed the usage of number of CPU core per job
+    '''
+    import optparse, sys, fnmatch
+    from rocks_solid import config_read
+    from rocks_solid import module_factory
+    
+    parser = optparse.OptionParser(usage='%prog <number of CPU>')
+    parser.add_option('-c', '--config', dest='config', 
+        help="path to configuration file")
+    parser.add_option('-v', '--verbose', dest='verbose', action="store_true", default=False,
+        help="verbose output")
+    parser.add_option('-d', '--dry-run', dest='dry_run', action="store_true", default=False,
+        help="dry run (just test, no cancel)")
+    parser.add_option('-q', '--queue', dest='queue', default=None,
+        help="queue name (default is all queue)")
+    parser.add_option('-o', '--owner', dest='owner', default='*',
+        help="owner of job (wildcard is possible here. default:*)")
+    options, args = parser.parse_args()
+    config = config_read()
+    if len(args) < 1 :
+        parser.error('need at least one argument')
+    queue = options.queue
+    owner = options.owner
+    if options.verbose :
+        print >> sys.stderr, 'Queue to check: %s' % (queue or 'all queues')
+        print >> sys.stderr, 'User to check: %s' % (owner)
+    ncore = int(args[0])
+    scheduler_mod = module_factory('rocks_solid.scheduler.%s' % config.scheduler)
+    scheduler = scheduler_mod.Scheduler()
+    job_list = scheduler.list()
+    for job in job_list :
+        if ((job.queue == queue) or (queue is None)) and \
+            fnmatch.fnmatch(job.owner, owner) and \
+            (job.np > ncore) :
+            if options.verbose :
+                print >> sys.stderr, 'Cancelling job %s, named %s, of user %s' % (job.jid, job.name, job.owner)
+            if not options.dry_run :
+                scheduler.cancel(job.jid)
+
 if __name__ == '__main__' :
     run_cluster_powersave()
