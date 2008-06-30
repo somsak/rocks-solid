@@ -22,6 +22,7 @@ entry_points = [
     'cluster-powersave = rocks_solid.app:run_cluster_powersave',
     'node-envcheck = rocks_solid.app:run_node_envcheck',
     'check-ignore-host = rocks_solid.app:run_check_ignore_host',
+    'queue-limit-user-cpu = rocks_solid.app:run_queue_limit_user_cpu',
 ]
 
 scripts = []
