@@ -18,9 +18,11 @@ def module_factory(name):
 
 def term_userps(user_list = []) :
     ps = os.popen('ps h -eo pid,user', 'r')
-    line = ps.readline()
     pid_list = []
-    while line :
+    while 1 :
+        line = ps.readline()
+        if not line :
+            break
         pid,user = line.split()
         if user_list and user not in user_list :
             continue
