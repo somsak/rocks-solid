@@ -1,0 +1,55 @@
+#!/opt/rocks/bin/python
+'''
+Sort host name in ROCKS convention (compute-x-x) form correctly
+'''
+
+import sys
+
+class NodeSorter :
+    '''
+    Simple sorter
+    '''
+    def __init__(self) :
+        self.output = []
+        self.input = []
+
+    def append(self, item) :
+        self.input.append(item)
+
+    def cmp(self, a, b) :
+        a = a.split('.', 1)[0]
+        b = b.split('.', 1)[0]
+        field1 = a.split('-')
+        field2 = b.split('-')
+        i = 0
+        result = None
+        while (i < len(field1)) and (i < len(field2)) :
+            try :
+                int_f1 = int(field1[i])
+                int_f2 = int(field2[i])
+                field1[i] = int_f1
+                field2[i] = int_f2
+            except ValueError :
+                pass
+            result = cmp(field1[i], field2[i])
+            if result != 0 :
+                return result
+            i = i + 1
+        return result
+
+    def sort(self) :
+        self.output = list(self.input)
+        self.output.sort(self.cmp)
+
+    def iteroutputs(self) :
+        for item in self.output :
+            yield item
+
+line = sys.stdin.readline()
+ns = NodeSorter()
+while line :
+    ns.append(line.strip())
+    line = sys.stdin.readline()
+ns.sort()
+for item in ns.iteroutputs() :
+    print item
