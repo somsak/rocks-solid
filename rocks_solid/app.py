@@ -193,6 +193,9 @@ def run_cluster_powersave() :
                 del all_free_hosts[key]
 
         if options.verbose :
+            print '******* All on-line hosts *******'
+            for key in all_online_hosts.iterkeys() :
+                print key
             print '******* All on-line and free hosts *******'
             for key in all_free_hosts.iterkeys() :
                 print key
@@ -266,9 +269,10 @@ def run_cluster_powersave() :
             else :
                 poweroff_hosts = []
 
-#            print len(poweroff_hosts)
-#            print poweroff_hosts
-#            print poweron_hosts
+            #print config.power_min_spare
+            #print len(poweroff_hosts)
+            #print poweroff_hosts
+            #print poweron_hosts
 
             # power off ndoes
             if poweroff_hosts :
