@@ -16,15 +16,20 @@ def module_factory(name):
         mod = getattr(mod, comp)
     return mod
 
-def term_userps(user_list = []) :
+def term_userps(user_list = [], exclude_list = [], **kwargs) :
     ps = os.popen('ps h -eo pid,user', 'r')
     pid_list = []
+    debug = kwargs.get('debug', False)
     while 1 :
         line = ps.readline()
         if not line :
             break
         pid,user = line.split()
+        if exclude_list and user in exclude_list :
+            if debug : print >> sys.stderr, 'exclude user ', user
+            continue
         if user_list and user not in user_list :
+            if debug : print >> sys.stderr, 'user %s not in user list' % (user)
             continue
         id = pwd.getpwnam(user)[2]
         if id >= 500 and user not in known_system_users :
@@ -32,7 +37,10 @@ def term_userps(user_list = []) :
         line = ps.readline()
     ps.close()
     if pid_list :
-        os.system('kill -s KILL ' + ' '.join(pid_list))
+        if debug : 
+            print >> sys.stderr, 'terminate processes %s' % ' '.join(pid_list)
+        else :
+            os.system('kill -s KILL ' + ' '.join(pid_list))
 
 def term_sge_zombie(user_list = []) :
     ps = os.popen('ps h -eo pid,ppid,user', 'r')

@@ -47,10 +47,17 @@ def run_node_term_user_ps() :
     from rocks_solid import cleanipcs
     from rocks_solid import term_userps
 
-    parser = optparse.OptionParser(usage='%prog <user1> <user2> ...')
+    parser = optparse.OptionParser(usage='%prog [options] <user1> <user2> ...')
+    parser.add_option('-x', '--exclude', dest='exclude', default='',
+        help='exclude listed user (comma separated)')
+    parser.add_option('-d', '--debug', dest='debug', action="store_true", default=False,
+        help='run in debug mode')
     options, args = parser.parse_args()
     user_list = args
-    term_userps(user_list)
+    exclude_list = []
+    if options.exclude :
+        exclude_list = options.exclude.split(',')
+    term_userps(user_list, exclude_list, debug=options.debug)
 
 def run_node_term_sge_zombie() :
     import optparse
