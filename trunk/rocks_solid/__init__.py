@@ -2,7 +2,7 @@
 Rocks-solid main function
 '''
 
-import os, pwd, popen2, string, sys, time, re, types
+import os, pwd, popen2, string, sys, time, re, types, shutil
 from StringIO import StringIO
 from ConfigParser import ConfigParser
 from threading import Thread, Condition
@@ -287,7 +287,56 @@ class Launcher(object) :
                 sys.stdout.write(host.split('.')[0][:20] + ':\t' + line + '\n')
             soutput.close()
 
+def _get_pid(path) :
+    f = open(os.path.join(path, 'data'), 'r')
+    pid = f.readline().strip()
+    f.close()
+    return int(pid)
+
+def acquire_lock(path) :
+    '''
+    Acquire a lock
+
+    @arg path path of lock
+    @type string
+    @return handle of current lock, or None if lock failed
+    '''
+    data_path = os.path.join(path, 'data')
+    while True :
+        try :
+            os.mkdir(path)
+            f = open(data_path, 'w')
+            f.write('%d\n' % os.getpid())
+            f.close()
+            return path
+        except Exception, e:
+            pid = None
+            try :
+                pid = _get_pid(path)
+            except :
+                pass
+            if pid and os.path.exists('/proc/%d' % pid) :
+                return None
+            else :
+                shutil.rmtree(path)
+
+def release_lock(handle) :
+    '''
+    Release a lock
+
+    @arg handle handle returned by acquire_lock
+    @type string
+    '''
+    path = handle
+    try :
+        pid = _get_pid(path)
+        if os.getpid() == pid :
+            shutil.rmtree(path)
+    except :
+        pass
+
 if __name__  == '__main__' :
+    import tempfile
     c = config_read('./rocks-solid.conf')
     for attr in dir(c) :
         print attr, getattr(c, attr)
@@ -295,3 +344,10 @@ if __name__  == '__main__' :
     def test_func(host, ab, cd) :
         print host, ab, cd
     l.launch(['compute-0-0', 'compute-0-1', 'compute-0-2'], test_func, ['test1', 'test2'])
+    path = os.path.join(tempfile.gettempdir(), 'test.lock')
+    print acquire_lock(path)
+    print acquire_lock(path)
+    print release_lock(path)
+    print release_lock(path)
+
+

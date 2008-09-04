@@ -46,7 +46,7 @@ import %s
 
 setup(
     name = "rocks-solid",
-    version = "0.4.3",
+    version = "0.4.4",
 #    packages = find_packages(),
     packages = list_my_packages(),
 #    scripts = glob.glob('scripts/*-*'),
