@@ -60,14 +60,16 @@ def run_node_term_user_ps() :
     term_userps(user_list, exclude_list, debug=options.debug)
 
 def run_node_term_sge_zombie() :
-    import optparse
-    from rocks_solid import cleanipcs
-    from rocks_solid import term_sge_zombie
+    import optparse, tempfile, os
+    from rocks_solid import cleanipcs, term_sge_zombie, acquire_lock, release_lock
 
     parser = optparse.OptionParser(usage='%prog <user1> <user2> ...')
     options, args = parser.parse_args()
     user_list = args
-    term_sge_zombie(user_list)
+    lock_path = os.path.join(tempfile.gettempdir(), 'term_sge_zombie.lock')
+    if acquire_lock(lock_path) :
+        term_sge_zombie(user_list)
+        release_lock(lock_path)
 
 def run_cluster_freehost() :
     import sys, os, optparse
@@ -308,9 +310,8 @@ def log_date(file) :
     f.close()
 
 def run_node_envcheck() :
-    import optparse
-    from rocks_solid import config_read
-    from rocks_solid import module_factory
+    import optparse, tempfile, os
+    from rocks_solid import config_read, module_factory, acquire_lock, release_lock
 
     parser = optparse.OptionParser()
     parser.add_option('-d', '--dryrun', dest='dryrun', action="store_true",
@@ -320,6 +321,11 @@ def run_node_envcheck() :
 
     options, args = parser.parse_args()
     config = config_read()
+
+    lock_path = os.path.join(tempfile.gettempdir(), 'env_check.lock')
+    if not acquire_lock(lock_path) :
+        return -1
+
     if options.verbose :
         setattr(config, 'verbose', True)
     else :
@@ -355,6 +361,7 @@ def run_node_envcheck() :
             if not options.dryrun :
                 log_date(log)
                 action.act()
+    release_lock(lock_path)
 
 def run_check_ignore_host() :
     import optparse
