@@ -16,16 +16,16 @@ class IPMIPower(BasePower) :
         self.power_status_cmd = ["power", "status"]
         self.ipmi = IPMI(config)
 
-    def on(self, host_list) :
-        self.ipmi.cmd_all(host_list, self.power_on_cmd, 0.5)
+    def on(self, host_list, **kwargs) :
+        self.ipmi.cmd_all(host_list, self.power_on_cmd, 0.5, **kwargs)
         
-    def off(self, host_list) :
-        self.ipmi.cmd_all(host_list, self.power_off_cmd, -1)
+    def off(self, host_list, **kwargs) :
+        self.ipmi.cmd_all(host_list, self.power_off_cmd, -1, **kwargs)
 
-    def reset(self, host_list) :
-        self.ipmi.cmd_all(host_list, self.power_reset_cmd, -1)
+    def reset(self, host_list, **kwargs) :
+        self.ipmi.cmd_all(host_list, self.power_reset_cmd, -1, **kwargs)
 
-    def status(self, host_list) :
-        self.ipmi.cmd_all(host_list, self.power_status_cmd, -1)
+    def status(self, host_list, **kwargs) :
+        self.ipmi.cmd_all(host_list, self.power_status_cmd, -1, **kwargs)
 
 Power = IPMIPower

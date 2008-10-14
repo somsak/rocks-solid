@@ -25,8 +25,8 @@ class WOLPower(BasePower) :
             self.mac_dict[hostname] = mac
         report.close()
 
-    def on(self, host_list) :
-        self.launcher.launch(host_list, self.wol, delay = 0.5)
+    def on(self, host_list, **kwargs) :
+        self.launcher.launch(host_list, self.wol, delay = 0.5, **kwargs)
 
     def wol(self, host) :
         host = socket.getfqdn(host)
