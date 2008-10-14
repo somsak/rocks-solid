@@ -232,12 +232,14 @@ class Launcher(object) :
         launcher.condition.notify()
         launcher.condition.release()
 
-    def launch(self, host_list, func, more_arg = None, delay = 0, num_thread = 10) :
+    def launch(self, host_list, func, more_arg = None, delay = 0, num_thread = 10, **kwargs) :
         if delay < 0 :
             self.num_thread = num_thread
             self.condition = Condition()
             self.count_thread = 0
             self.condition.acquire()
+
+        output_handler = kwargs.get('output_handler', self.print_output)
 
         for host in host_list :
             skip = 0
@@ -255,11 +257,11 @@ class Launcher(object) :
             if delay >= 0:
                 time.sleep(delay)
                 output, error = func(*args)
-                self.print_output(host, output, error)
+                output_handler(host, output, error)
             elif delay < 0 :
                 while self.output :
                     key, value = self.output.popitem()
-                    self.print_output(key, value[0], value[1])
+                    output_handler(key, value[0], value[1])
                     self.count_thread -= 1
                 t = Thread(target = self.thread_run, args = (self, func, args))
                 t.start()
@@ -270,7 +272,7 @@ class Launcher(object) :
             while self.count_thread > 0 :
                 while self.output :
                     key, value = self.output.popitem()
-                    self.print_output(key, value[0], value[1])
+                    output_handler(key, value[0], value[1])
                     self.count_thread -= 1
                 if self.count_thread > 0 :
                     self.condition.wait()

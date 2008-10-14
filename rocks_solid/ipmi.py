@@ -89,11 +89,11 @@ class IPMI(object) :
             retval.append(self.gen_host(host))
         return retval
 
-    def iterate(self, host_list) :
-        for host in host_list :
-            yield self.gen_host(host)
+#    def iterate(self, host_list) :
+#        for host in host_list :
+#            yield self.gen_host(host)
 
-    def cmd_all(self, host_list, args, delay = 0) :
+    def cmd_all(self, host_list, args, delay = 0, **kwargs) :
         '''
         Issue IPMI command to remote host
 
@@ -105,7 +105,7 @@ class IPMI(object) :
         new_args = '"'
         new_args = new_args + '" "'.join(args)
         new_args = new_args + '"'
-        self.launcher.launch(self.iterate(host_list), self.cmd, [new_args], delay)
+        self.launcher.launch(host_list, self.cmd, [new_args], delay, **kwargs)
     
     def cmd(self, host, args) :
         '''
@@ -116,9 +116,10 @@ class IPMI(object) :
         @type args list of string
         @param args IPMI command
         '''
-        exit_stat = os.system('ping -c1 -w1 %s > /dev/null 2>&1' % host)
+        real_host = self.gen_host(host)
+        exit_stat = os.system('ping -c1 -w1 %s > /dev/null 2>&1' % real_host)
         if os.WIFEXITED(exit_stat) and os.WEXITSTATUS(exit_stat) == 0 :
-            cmdline = 'ipmitool ' + self.ipmi_arg % host + args
+            cmdline = 'ipmitool ' + self.ipmi_arg % real_host + args
             cmd = os.popen(cmdline, 'r')
             output = cmd.read()
             error = ''

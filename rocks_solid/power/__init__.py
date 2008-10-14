@@ -20,16 +20,16 @@ class BasePower(object) :
         else :
             return False
 
-    def on(self, host_list) :
+    def on(self, host_list, **kwargs) :
         pass
 
-    def off(self, host_list) :
+    def off(self, host_list, **kwargs) :
         pass
 
-    def reset(self, host_list) :
+    def reset(self, host_list, **kwargs) :
         pass
 
-    def status(self, host_list) :
+    def status(self, host_list, **kwargs) :
         pass
 
 class ClusterPower(rocks.pssh.ClusterFork) :
