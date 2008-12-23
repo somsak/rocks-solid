@@ -500,50 +500,30 @@ def run_cluster_poweron_sched_nodes() :
     options, args = parser.parse_args()
 
     config = config_read()
-    all_output = {}
-    def _output_handler(host, output, error) :
-        all_output[host] = (output, error)
 
     try :
         scheduler_mod = module_factory('rocks_solid.scheduler.%s' % config.scheduler)
-        scheduler = scheduler_mod.Scheduler()
+        scheduler = scheduler_mod.Scheduler(conf={'extend_status':True})
         job_list = scheduler.list()
-        online_hosts, offline_hosts = scheduler.hosts()
+        hosts_used_by_job = {}
+        for job in job_list :
+            for host in job.host :
+                hosts_used_by_job[host] = 1
 
-        offline_host_names = map(lambda a: a.name, offline_hosts)
-        i = 0
-        while i < len(offline_host_names) :
-            if check_ignore(offline_host_names[i], config.power_ignore_host) :
-                del offline_host_names[i]
-            else :
-                i += 1
-            
-        power_status_mod = module_factory('rocks_solid.power.%s' % (config.powerstatus_driver))
-        power_status = power_status_mod.Power(config)
-        power_status.status(offline_host_names, output_handler = _output_handler)
-        # got output here
-        # NOTE: host name here might already being mangled, 
-        # This may have problem with IPMI
-        reset_hosts = []
-        for host, output in all_output.iteritems() :
-            output = output[0]
-            if output.find('on') >= 0:
-                # this host was reported off-line, but actually on-line
-                reset_hosts.append(host)
+        power_on_mod = module_factory('rocks_solid.power.%s' % (options.on or config.poweron_driver))
+        power_on = power_on_mod.Power(config)
 
+        host_to_poweron = hosts_used_by_job.keys()
         if options.dry_run or options.verbose :
             print '*** The following host will be reset ***'
-            print reset_hosts
+            print host_to_poweron
 
         if not options.dry_run :
-            power_reset_mod = module_factory('rocks_solid.power.%s' % (options.reset or config.powerreset_driver))
-            power_reset = power_reset_mod.Power(config)
-            power_reset.reset(reset_hosts)
+            power_on.on(host_to_poweron)
 
     except ImportError :
         parser.error('Unknown scheduler/power setting: %s' % config.scheduler)
         sys.exit(1)
-
 
 
 #def run_cluster_poweron_nodes_from_job() :
