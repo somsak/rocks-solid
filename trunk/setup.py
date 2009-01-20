@@ -4,7 +4,7 @@ import os, glob, sys
 from distutils.core import setup
 
 def list_my_packages() :
-    retval = ['rocks_solid']
+    retval = ['', 'rocks_solid']
     for dir in os.listdir('rocks_solid') :
         path = os.path.join('rocks_solid', dir)
         if os.path.isdir(path) and (dir != '.svn') and (dir != 'CVS') :
@@ -58,6 +58,9 @@ setup(
     # installed or upgraded on the target machine
 #    install_requires = ['docutils >= 0.3'],
 
+    data_files = [
+        ('/etc/', ['rocks-solid.conf']),
+    ],
 #    package_data = {
 #        # If any package contains *.txt or *.rst files, include them:
 #        '': ['*.txt', '*.rst'],
