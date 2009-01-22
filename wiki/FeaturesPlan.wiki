@@ -8,6 +8,7 @@
    * support for user specified shutdown step
    * quick/normal step
   * reconfigurable number of thread in rocks-solid.conf
+  * Use new DB interface
 
 = 0.1-0.4 =
   * Initial release
