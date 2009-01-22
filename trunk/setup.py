@@ -4,7 +4,7 @@ import os, glob, sys
 from distutils.core import setup
 
 name = 'rocks-solid'
-version = '0.5.0'
+version = '0.5.0a'
 
 def list_my_packages() :
     retval = ['', 'rocks_solid']
