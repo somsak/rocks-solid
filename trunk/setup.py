@@ -3,6 +3,9 @@
 import os, glob, sys
 from distutils.core import setup
 
+name = 'rocks-solid'
+version = '0.5.0'
+
 def list_my_packages() :
     retval = ['', 'rocks_solid']
     for dir in os.listdir('rocks_solid') :
@@ -47,8 +50,8 @@ import %s
     return scripts
 
 setup(
-    name = "rocks-solid",
-    version = "0.4.6",
+    name = name,
+    version = version,
 #    packages = find_packages(),
     packages = list_my_packages(),
 #    scripts = glob.glob('scripts/*-*'),
@@ -59,7 +62,7 @@ setup(
 #    install_requires = ['docutils >= 0.3'],
 
     data_files = [
-        ('/etc/', ['rocks-solid.conf']),
+        ('share/doc/' + name + os.sep + version, ['rocks-solid.conf', 'COPYING']),
     ],
 #    package_data = {
 #        # If any package contains *.txt or *.rst files, include them:
