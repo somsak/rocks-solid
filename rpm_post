@@ -1,1 +1,1 @@
-chmod 600 $RPM_BUILD_ROOT/etc/rocks-solid.conf
+chmod 600 /etc/rocks-solid.conf >& /dev/null

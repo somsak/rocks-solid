@@ -11,10 +11,10 @@ from rocks_solid import module_factory
 class BasePower(object) :
     def __init__(self, config) :
         self.config = config
-        self.launcher = Launcher(ignore=config.power_ignore_host)
+        self.launcher = Launcher(ignore=config.power_ignore_host, num_thread = self.config.num_thread)
 
     def ping(self, host) :
-        exit_stat = os.system('ping -c1 -w1 %s > /dev/null 2>&1' % host)
+        exit_stat = os.system('ping -c1 -w2 %s > /dev/null 2>&1' % host)
         if os.WIFEXITED(exit_stat) and os.WEXITSTATUS(exit_stat) == 0 :
             return True
         else :

@@ -62,7 +62,7 @@ setup(
 #    install_requires = ['docutils >= 0.3'],
 
     data_files = [
-        ('share/doc/' + name + os.sep + version, ['rocks-solid.conf', 'COPYING']),
+        ('share/doc/' + name + '-' + version, ['rocks-solid.conf', 'COPYING']),
     ],
 #    package_data = {
 #        # If any package contains *.txt or *.rst files, include them:
