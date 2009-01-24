@@ -143,6 +143,7 @@ class Config :
     default_queue = ''
     power_loadavg = 0.2
     power_db = 'sqlite:////var/tmp/host_activity.sqlite'
+    num_thread = 10
 
 def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     '''
@@ -185,6 +186,9 @@ def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     if type(config.power_loadavg) != types.FloatType :
         config.power_loadavg = float(config.power_loadavg)
 
+    if type(config.num_thread) != types.IntType :
+        config.num_thread = int(config.num_thread)
+
     del config_parser
 
     return config
@@ -211,7 +215,7 @@ class Launcher(object) :
     def __init__(self, **kw) :
         self.ignore = kw.get('ignore', [])
         self.condition = None
-        self.num_thread = 0
+        self.num_thread = kw.get('num_thread', 10)
         self.count_thread = 0
         self.output = {}
         self.thread_list = {}
@@ -232,9 +236,8 @@ class Launcher(object) :
         launcher.condition.notify()
         launcher.condition.release()
 
-    def launch(self, host_list, func, more_arg = None, delay = 0, num_thread = 10, **kwargs) :
+    def launch(self, host_list, func, more_arg = None, delay = 0, **kwargs) :
         if delay < 0 :
-            self.num_thread = num_thread
             self.condition = Condition()
             self.count_thread = 0
             self.condition.acquire()

@@ -33,6 +33,15 @@ class SWPower(BasePower) :
         cmd.wait()
         return output, error
 
+    def status(self, host_list) :
+        self.launcher.launch(host_list, self.sw_ping, delay = -1)
+
+    def sw_ping(self, host) :
+        if self.ping(host) :
+            return 'up', ''
+        else :
+            return 'down', ''
+
     def reset(self, host_list) :
         self.launcher.launch(host_list, self.ssh_reboot, delay = -1)
 

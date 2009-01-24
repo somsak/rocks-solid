@@ -58,7 +58,7 @@ class IPMI(object) :
         else :
             # execution pattern
             self.gen_host = self._host_command
-        self.launcher = Launcher(ignore=config.power_ignore_host)
+        self.launcher = Launcher(ignore=config.power_ignore_host, num_thread = self.config.num_thread)
 
     def _host_substitute(self, host) :
         '''
