@@ -4,9 +4,6 @@
   * Node-selection algorithm (base on electrical phase) for cluster-powersave
 
 = 0.5 =
-  * cluster-shutdown command supported
-   * support for user specified shutdown step
-   * quick/normal step
   * reconfigurable number of thread in rocks-solid.conf
   * Use new DB interface
 
