@@ -5,13 +5,13 @@ From the v0.1, I found that power on a machine does not really means that a mach
 
 So the new interface will be more or less like the same, with additional table
 == Table Details ==
-*host_activity table*
+*status table*
  * ID (auto-increment)
  * Hostname (VARCHAR(255) )
  * OnTime (DateTime)
  * OffTime (DateTime)
  * DESC (TEXT)
-*host_event table*
+*event table*
  * ID (auto-increment)
  * Hostname (VARCHAR(255))
  * Event (Enum? Right now it's just on or off)
