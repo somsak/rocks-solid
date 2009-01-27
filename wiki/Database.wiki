@@ -11,7 +11,7 @@ So the new interface will be more or less like the same, with additional table
  * OnTime (DateTime)
  * OffTime (DateTime)
  * DESC (TEXT)
-*host_trigger table*
+*host_event table*
  * ID (auto-increment)
  * Hostname (VARCHAR(255))
  * Event (Enum? Right now it's just on or off)
