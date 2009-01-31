@@ -12,7 +12,7 @@ from sqlalchemy.sql import and_, or_, not_
 
 metadata = MetaData()
 
-host_activity = Table('host_activity', metadata,
+host_status = Table('status', metadata,
         Column('id', Integer, primary_key = True),
         Column('name', String(255), nullable = False),
         Column('on_time', DateTime, nullable = False),
@@ -39,7 +39,7 @@ class HostActivity(object) :
         elif type(other) == type(self) :
             return (self.id.__cmp__(other) and self.name.__cmp__(other))
 
-mapper(HostActivity, host_activity)
+mapper(HostActivity, host_status)
 
 class DB(object) :
     '''
@@ -98,9 +98,9 @@ class DB(object) :
         conn = self.engine.connect()
         for host in host_list :
             if state == 'off' :
-                conn.execute(host_activity.update(and_(host_activity.c.name == host, host_activity.c.off_time == None)), off_time = datetime.now(), off_comment = 'manual off')
+                conn.execute(host_status.update(and_(host_status.c.name == host, host_status.c.off_time == None)), off_time = datetime.now(), off_comment = 'manual off')
             else :
-                conn.execute(host_activity.insert(values={'name':host, 'on_time':datetime.now(), 'on_comment':'manual on'}))
+                conn.execute(host_status.insert(values={'name':host, 'on_time':datetime.now(), 'on_comment':'manual on'}))
 
 if __name__ == '__main__' :
     import os
