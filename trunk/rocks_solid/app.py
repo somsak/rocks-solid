@@ -528,9 +528,51 @@ def run_cluster_poweron_sched_nodes() :
         parser.error('Unknown scheduler/power setting: %s' % config.scheduler)
         sys.exit(1)
 
+def run_cluster_status_acct() :
+    import sys, os, optparse
+    import rocks_solid.power
+    from rocks_solid import module_factory
+    from rocks_solid import config_read, check_ignore, module_factory
+    try :
+        from rocks_solid.db import DB
 
-#def run_cluster_poweron_nodes_from_job() :
-#    def 
+        # initializa host activity database
+        db = DB(url = config.power_db, verbose = options.verbose)
+    except ImportError :
+        db = None
+
+    parser = optparse.OptionParser()
+    parser.add_option('-d', '--dry-run', dest='dry_run', action="store_true",
+        help="Do nothing, just print what will do")
+    parser.add_option('-v', '--verbose', dest='verbose', action="store_true",
+        help="Verbose output")
+    options, args = parser.parse_args()
+
+    config = config_read()
+
+    try :
+        limit = config.power_max_limit
+        scheduler_mod = module_factory('rocks_solid.scheduler.%s' % config.scheduler)
+        scheduler = scheduler_mod.Scheduler()
+        onlines, offlines = scheduler.hosts()
+
+        if options.verbose :
+            print '***** online hosts *****'
+            print onlines
+            print '***** offline hosts *****'
+            print offlines
+
+        # syhcronize host status into database
+        if not options.dry_run :
+            if db :
+                db.sync_host_status(onlines, offlines)
+                db.update_event(onlines, offlines, limit)
+            else :
+                print 'not updating database, no driver exist'
+        
+    except ImportError: 
+        parser.error('Unknown scheduler/power setting: %s' % config.scheduler)
+        sys.exit(1)
 
 if __name__ == '__main__' :
     run_cluster_powersave()

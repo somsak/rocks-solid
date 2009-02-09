@@ -28,6 +28,7 @@ entry_points = [
     'queue-limit-user-cpu = rocks_solid.app:run_queue_limit_user_cpu',
     'cluster-reset-freeze-node = rocks_solid.app:run_reset_freeze_node',
     'cluster-poweron-sched-nodes = rocks_solid.app:run_cluster_poweron_sched_nodes',
+    'cluster-status-acct = rocks_solid.app:run_cluster_status_acct',
 ]
 
 scripts = []
