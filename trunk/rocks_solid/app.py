@@ -290,7 +290,7 @@ def run_cluster_powersave() :
             if poweroff_hosts :
                 power.nodes = poweroff_hosts
                 if not options.dryrun and db:
-                    db.update_hosts(poweroff_hosts, 'off')
+                    db.insert_event(poweroff_hosts, db.auto_off)
                     power.run(command=['off'])
                 else :
                     print 'power down %s' % poweroff_hosts
@@ -298,7 +298,7 @@ def run_cluster_powersave() :
         if poweron_hosts :
             power.nodes = poweron_hosts
             if not options.dryrun and db :
-                db.update_hosts(poweron_hosts, 'on')
+                db.insert_event(poweroff_hosts, db.auto_on)
                 power.run(command=['on'])
             else :
                 print 'power on %s' % poweron_hosts

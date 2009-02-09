@@ -192,3 +192,4 @@ if __name__ == '__main__' :
     db.insert_event(['compute-0-5.local', 'compute-0-1.local'], 'auto_on')
     time.sleep(2)
     db.update_event(['compute-0-5.local'], ['compute-0-1.local'], 1)
+    print db.auto_on
