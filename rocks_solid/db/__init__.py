@@ -94,13 +94,12 @@ class DB(object) :
         '''
         metadata.create_all(self.engine)
 
-    def sync_on_hosts(self, host_list) :
+    def sync_host_status(self, onlines, offlines) :
         '''
-        Put the list of specified hosts to database
-        For host that's not in host_list, update the host as down
+        Synchronize online/offline host status into database
 
-        @type host_list list of string
-        @param host_list list of on-line host name
+        @type onlines list of string
+        @param onlines list of on-line host name
         '''
         Session = sessionmaker(bind=self.engine, autoflush=True, transactional=True)
         session = Session()
@@ -111,15 +110,13 @@ class DB(object) :
         # in case we miss something (host downed by administrative request)
         now = datetime.today()
         for host_act in result :
-            if host_act.name not in host_list :
+            if host_act.name in offlines :
                 host_act.off_time = now
                 host_act.desc = 'off detected'
                 #print host_act.name
                 #session.save(host_act)
-            else :
-                host_list.remove(host_act.name)
         # build new on-line hosts
-        for host in host_list :
+        for host in onlines :
             session.save(HostStatus(name=host, on_time=now, desc='on detected'))
         session.commit()
 
@@ -186,7 +183,7 @@ if __name__ == '__main__' :
     #db_path = 'mysql://stat:1q2w3e4r@localhost/node_status'
     print db_path
     db = DB(url=db_path, verbose=True)
-    db.sync_on_hosts(['compute-0-1.local', 'compute-0-2.local', 'compute-0-3.local'])
+    db.sync_host_status(['compute-0-1.local', 'compute-0-2.local', 'compute-0-3.local'])
     db.update_hosts(['compute-0-1.local', 'compute-0-4.local'], 'off')
     db.update_hosts(['compute-0-5.local'], 'on')
     db.insert_event(['compute-0-5.local', 'compute-0-1.local'], 'auto_on')

@@ -142,6 +142,7 @@ class Config :
     power_ignore_host = []
     default_queue = ''
     power_loadavg = 0.2
+    power_max_limit = 300
     power_db = 'sqlite:////var/tmp/host_activity.sqlite'
     num_thread = 10
 
