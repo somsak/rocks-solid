@@ -142,7 +142,13 @@ def run_cluster_powersave() :
     from rocks_solid import config_read, check_ignore
     from rocks_solid import module_factory
     from rocks_solid.power import ClusterPower
-    from rocks_solid.db import DB
+    try :
+        from rocks_solid.db import DB
+
+        # initializa host activity database
+        db = DB(url = config.power_db, verbose = options.verbose)
+    except ImportError :
+        db = None
 
     parser = optparse.OptionParser()
     parser.add_option('-d', '--dryrun', dest='dryrun', action="store_true", default=False,
@@ -154,9 +160,6 @@ def run_cluster_powersave() :
 
     # query queue information
     config = config_read()
-
-    # initializa host activity database
-    db = DB(url = config.power_db, verbose = options.verbose)
 
     # do we need to ignore everything? 
     if os.path.exists(powersave_ignore_file) or \
@@ -209,8 +212,8 @@ def run_cluster_powersave() :
             for key in all_free_hosts.iterkeys() :
                 print key
 
-        if not options.dryrun :
-            db.insert_on_hosts(all_online_hosts.keys())
+#        if not options.dryrun and db :
+#            db.insert_on_hosts(all_online_hosts.keys())
 
         if config.default_queue :
             default_queue = config.default_queue
@@ -286,7 +289,7 @@ def run_cluster_powersave() :
             # power off ndoes
             if poweroff_hosts :
                 power.nodes = poweroff_hosts
-                if not options.dryrun :
+                if not options.dryrun and db:
                     db.update_hosts(poweroff_hosts, 'off')
                     power.run(command=['off'])
                 else :
@@ -294,7 +297,7 @@ def run_cluster_powersave() :
             # power on nodes
         if poweron_hosts :
             power.nodes = poweron_hosts
-            if not options.dryrun :
+            if not options.dryrun and db :
                 db.update_hosts(poweron_hosts, 'on')
                 power.run(command=['on'])
             else :
