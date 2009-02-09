@@ -142,13 +142,6 @@ def run_cluster_powersave() :
     from rocks_solid import config_read, check_ignore
     from rocks_solid import module_factory
     from rocks_solid.power import ClusterPower
-    try :
-        from rocks_solid.db import DB
-
-        # initializa host activity database
-        db = DB(url = config.power_db, verbose = options.verbose)
-    except ImportError :
-        db = None
 
     parser = optparse.OptionParser()
     parser.add_option('-d', '--dryrun', dest='dryrun', action="store_true", default=False,
@@ -158,8 +151,15 @@ def run_cluster_powersave() :
 
     options, args = parser.parse_args()
 
-    # query queue information
     config = config_read()
+
+    try :
+        from rocks_solid.db import DB
+
+        # initializa host activity database
+        db = DB(url = config.power_db, verbose = options.verbose)
+    except ImportError :
+        db = None
 
     # do we need to ignore everything? 
     if os.path.exists(powersave_ignore_file) or \
@@ -533,14 +533,8 @@ def run_cluster_status_acct() :
     import rocks_solid.power
     from rocks_solid import module_factory
     from rocks_solid import config_read, check_ignore, module_factory
-    try :
-        from rocks_solid.db import DB
 
-        # initializa host activity database
-        db = DB(url = config.power_db, verbose = options.verbose)
-    except ImportError :
-        db = None
-
+    config = config_read()
     parser = optparse.OptionParser()
     parser.add_option('-d', '--dry-run', dest='dry_run', action="store_true",
         help="Do nothing, just print what will do")
@@ -548,7 +542,13 @@ def run_cluster_status_acct() :
         help="Verbose output")
     options, args = parser.parse_args()
 
-    config = config_read()
+    try :
+        from rocks_solid.db import DB
+
+        # initializa host activity database
+        db = DB(url = config.power_db, verbose = options.verbose)
+    except ImportError :
+        db = None
 
     try :
         limit = config.power_max_limit
