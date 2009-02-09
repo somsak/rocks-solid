@@ -17,7 +17,7 @@ host_status = Table('status', metadata,
         Column('name', String(255), nullable = False, index = True),
         Column('on_time', DateTime, nullable = False),
         Column('off_time', DateTime),
-        Column('desc', String)
+        Column('desc', String(255))
     )
 
 class HostStatus(object) :
@@ -98,7 +98,7 @@ class DB(object) :
         '''
         Synchronize online/offline host status into database
 
-        @type onlines list of string
+        @type onlines list of scheduler.Host object
         @param onlines list of on-line host name
         '''
         Session = sessionmaker(bind=self.engine, autoflush=True, transactional=True)
@@ -115,9 +115,12 @@ class DB(object) :
                 host_act.desc = 'off detected'
                 #print host_act.name
                 #session.save(host_act)
+            else :
+                onlines.remove(host_act.name)
+                
         # build new on-line hosts
         for host in onlines :
-            session.save(HostStatus(name=host, on_time=now, desc='on detected'))
+            session.save(HostStatus(name=host.name, on_time=now, desc='on detected'))
         session.commit()
 
     def update_hosts(self, host_list, state = 'off') :
