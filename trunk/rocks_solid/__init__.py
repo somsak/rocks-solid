@@ -190,6 +190,9 @@ def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     if type(config.num_thread) != types.IntType :
         config.num_thread = int(config.num_thread)
 
+    if type(config.power_max_limit) != types.IntType :
+        config.power_max_limit = int(config.power_max_limit)
+
     del config_parser
 
     return config

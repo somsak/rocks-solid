@@ -15,8 +15,8 @@ metadata = MetaData()
 host_status = Table('status', metadata,
         Column('id', Integer, primary_key = True),
         Column('name', String(255), nullable = False, index = True),
-        Column('on_time', DateTime, nullable = False),
-        Column('off_time', DateTime),
+        Column('on_time', DateTime, nullable = False, index = True),
+        Column('off_time', DateTime, nullable = True, index = True, default = None),
         Column('desc', String(255))
     )
 
@@ -110,6 +110,7 @@ class DB(object) :
         # in case we miss something (host downed by administrative request)
         now = datetime.today()
         for host_act in result :
+            #print 'host_act = ', host_act
             if host_act.name in offlines :
                 host_act.off_time = now
                 host_act.desc = 'off detected'
