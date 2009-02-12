@@ -167,7 +167,7 @@ class DB(object) :
         limit_delta = timedelta(0, limit)
         for event in result :
             # check on-line hosts, regardless of limit
-            print event
+            #print event
             if ((event.event == self.auto_on) and (event.name in onlines)) or \
                ((event.event == self.auto_off) and (event.name in offlines)) :
                 event.status = self.success
