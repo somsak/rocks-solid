@@ -26,8 +26,6 @@ So I decided to make it simple and easy. Right now the approach to power on and 
              [end]
 }}}
 
-So in case there's any job queued. _No node will be powered down at all._
+So in case there is any job queued. _No node will be powered down at all._ and _The node will be powered on until the job is being run._
 
-So in case there's job(s) queued. The node will be powered on until the job is being run.
-
-Off course there's the starvation problem here. If there's a job queued but the job can not run on any free-node, available at the time, due to some resource constrain or anything. cluster-powersave will just trying to power on more nodes until the job can run.  _If all nodes already on, cluster-powersave will do noting at all even if there're some free nodes_.
+Off course there is the starvation problem here. If there is a job queued but the job can not run on any free-node available at the time, due to some resource constrain or anything. cluster-powersave will just trying to power on more nodes until the job can run.  _If all nodes already on, cluster-powersave will do noting at all even if there are some free nodes_.
