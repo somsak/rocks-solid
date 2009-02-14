@@ -57,3 +57,6 @@ Most 'cluster-' command here has the same syntax as cluster-fork. You can use '-
   * *cluster-clean-ps* - terminate all orphaned processes in compute nodes which are. 
    * not owned by sge_sphered (not started by SGE)
    * not owned by SSHD (not started by MPICH)
+  * *cluster-status-acct* - log up/down time of compute nodes into database. This command is mainly use for accounting purpose. Ex: compare this to scheduler accounting log to see if your compute nodes has been effectively utilized.
+  * *cluster-poweron-sched-nodes* - when a cluster is shutdown, usually all the jobs that was in running state _might_ still be in "running" state after cluster is power on. This command will poweron nodes that being used by any running job (should be no harm on nodes that is already powered on). You can put this command in /etc/rc.d/rc.local to have it power on compute nodes base on current job queue.
+  * *cluster-reset-freeze-node* - If you have a stable node status checker like IPMI, this command can be used to reset nodes that is not appear in scheduler host list, but the status was reported as "on". The command will not work without IPMI, since it require hardware reset interface.
