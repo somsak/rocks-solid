@@ -1,12 +1,18 @@
 if [ ! -f %{_sysconfdir}/rocks-solid.conf ]; then
-	cp -f %{_docdir}/rocks-solid-%{version}/rocks-solid.conf %{_sysconfdir}
+	cp -f %{_docdir}/%{name}-%{version}/rocks-solid.conf %{_sysconfdir}
 fi
+chmod 600 /etc/rocks-solid.conf >& /dev/null || :
+
 # create initial contrab entry
-if [ ! -f %{_sysconfdir}/cron.d/rocks-solid ]; then
-	cat >> %{_sysconfdir}/cron.d/rocks-solid << 'EOF'
+if [ ! -f %{_sysconfdir}/cron.d/%{name} ]; then
+
+	cat > %{_sysconfdir}/cron.d/%{name} << 'EOF'
 # run powersave and status acct every 5 minutes
 */5 * * * *	/opt/rocks/bin/cluster-powersave >& /dev/null
 */5 * * * *	/opt/rocks/bin/cluster-status-acct >& /dev/null
-'EOF'
+# optionally run node-envcheck to shutdown system when something bad happened
+#*/5 * * * *	/opt/rocks/bin/node-envcheck >& /dev/null
+
+EOF
+
 fi
-chmod 600 /etc/rocks-solid.conf >& /dev/null || :
