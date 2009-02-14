@@ -7,6 +7,13 @@ chmod 600 /etc/rocks-solid.conf >& /dev/null || :
 if [ ! -f %{_sysconfdir}/cron.d/%{name} ]; then
 
 	cat > %{_sysconfdir}/cron.d/%{name} << 'EOF'
+# uncomment lines below if you are using SGE
+#SGE_CELL=default
+#SGE_ARCH=lx26-amd64
+#SGE_EXECD_PORT=537
+#SGE_QMASTER_PORT=536
+#SGE_ROOT=/opt/gridengine
+
 # run powersave and status acct every 5 minutes
 */5 * * * *	/opt/rocks/bin/cluster-powersave >& /dev/null
 */5 * * * *	/opt/rocks/bin/cluster-status-acct >& /dev/null
