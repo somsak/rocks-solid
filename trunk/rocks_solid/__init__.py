@@ -123,6 +123,37 @@ def rocks_hostlist() :
         cmd.wait()
     return retval
 
+def rocks_etherlist(config) :
+    mac_dict = {}
+    if os.access('/opt/rocks/bin/rocks', os.X_OK) :
+        cmd = '/opt/rocks/bin/rocks list host interface'
+        report = os.popen(cmd, 'r')
+        first_line = True
+        while 1 :
+            line = report.readline()
+            if not line : break
+            if first_line :
+                first_line = False
+                continue
+            intf_info = line.strip().split()
+            if intf_info[2] == config.wol_interface :
+                mac_dict[intf_info[0][:-1]] = intf_info[3]
+        report.close()
+    elif os.access('/opt/rocks/bin/dbreport', os.X_OK) :
+        dbreport = '/opt/rocks/bin/dbreport ethers'
+        ether_wake = config.wol_etherwake
+        report = os.popen(dbreport, 'r')
+        while 1 :
+            line = report.readline()
+            if not line: break
+            try :
+                mac, hostname = line.strip().split()
+            except :
+                continue
+            mac_dict[hostname] = mac
+        report.close()
+    return mac_dict
+
 class Config :
     poweron_driver = 'ipmi'
     poweroff_driver = 'sw'
@@ -145,6 +176,8 @@ class Config :
     power_max_limit = 300
     power_db = 'sqlite:////var/tmp/host_activity.sqlite'
     num_thread = 10
+    wol_interface = 'eth0'
+    wol_etherwake = '/sbin/ether-wake'
 
 def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     '''
