@@ -86,7 +86,7 @@ setup(
     author = "Somsak Sriprayoonsakul",
     author_email = "somsaks@gmail.com",
     description = "Rocks-solid packages",
-    license = "PSF",
+    license = "GPLv3",
     keywords = "cluster rocks",
     url = "http://code.google.com/p/rocks-solid",   # project home page, if any
 
