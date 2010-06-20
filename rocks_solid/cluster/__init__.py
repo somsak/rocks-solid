@@ -90,16 +90,15 @@ class Rocks(ClusterIntf) :
                     mac = fields[3]
                     ip = fields[4]
                     field_to_add = {'name':iface, 'mac': mac, 'ip':ip}
-                    if interface_map.has_key(host) :
-                        interface_map[host].append(field_to_add)
-                    else :
-                        interface_map[host] = [field_to_add]
+                    if not interface_map.has_key(host) :
+                        interface_map[host] = {}
+                    interface_map[host][iface] = {'name':iface, 'mac': mac, 'ip':ip}
             elif self.dbreport_cmd :
                 mac, host = line.strip().split()
-                if interface_map.has_key(host) :
-                    interface_map[host].append({'mac': mac})
-                else :
-                    interface_map[host] = [{'mac': mac}]
+                if not interface_map.has_key(host) :
+                    interface_map[host] = {}
+                # old dbreport always stick with eth0, I believe
+                interface_map[host]['eth0'] = [{'mac': mac}]
                 
         cmd.stdout.close()
         retcode = cmd.wait()
