@@ -2,7 +2,7 @@
 '''
 IPMI Launcher
 '''
-import re, os, sys, string
+import re, os, sys, string, types
 
 from rocks_solid import Launcher
 import rocks.pssh
@@ -102,10 +102,15 @@ class IPMI(object) :
         @type args list of string
         @param args IPMI command
         '''
-        new_args = '"'
-        new_args = new_args + '" "'.join(args)
-        new_args = new_args + '"'
-        self.launcher.launch(host_list, self.cmd, [new_args], delay, **kwargs)
+        if type(args) == types.ListType :
+            new_args = '"'
+            new_args = new_args + '" "'.join(args)
+            new_args = new_args + '"'
+            new_args = [new_args]
+        else :
+            new_args = [args]
+        #print '** new_args ** = ', new_args
+        self.launcher.launch(host_list, self.cmd, new_args, delay, **kwargs)
     
     def cmd(self, host, args) :
         '''
@@ -117,9 +122,11 @@ class IPMI(object) :
         @param args IPMI command
         '''
         real_host = self.gen_host(host)
+        #print '**real_host** = ', real_host
         exit_stat = os.system('ping -c1 -w1 %s > /dev/null 2>&1' % real_host)
         if os.WIFEXITED(exit_stat) and os.WEXITSTATUS(exit_stat) == 0 :
             cmdline = 'ipmitool ' + self.ipmi_arg % real_host + args
+            #print '**cmdline** = ', cmdline
             cmd = os.popen(cmdline, 'r')
             output = cmd.read()
             error = ''
