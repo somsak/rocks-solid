@@ -32,13 +32,10 @@ class BasePower(object) :
     def status(self, host_list, **kwargs) :
         pass
 
-class ClusterPower(rocks.pssh.ClusterFork) :
-    def __init__(self, argv, config) :
-        rocks.pssh.ClusterFork.__init__(self, argv)
+class App(object) :
+    def __init__(self, config) :
         self.config = config
         power = {}
-        self.usage_name = 'Cluster Power'
-        self.usage_version = '1.0'
 
         try :
             p = module_factory('rocks_solid.power.%s' % (self.config.poweron_driver))
@@ -65,6 +62,16 @@ class ClusterPower(rocks.pssh.ClusterFork) :
             raise IOError('No module named %s' % self.config.powerstatus_driver)
 
         self.power = power
+    
+    def run(self, node_list, command) :
+        eval("self.power['%s'].%s(node_list)" % (command, command)
+
+class ClusterPower(rocks.pssh.ClusterFork) :
+    def __init__(self, argv, config) :
+        rocks.pssh.ClusterFork.__init__(self, argv)
+        self.usage_name = 'Cluster Power'
+        self.usage_version = '1.0'
+        self.app = App(config)
 
     def usageTail(self) :
         return ' on/off/reset/status'
@@ -94,7 +101,7 @@ class ClusterPower(rocks.pssh.ClusterFork) :
 
 #        print args[0]
 #        print nodelist
-        eval("self.power['%s'].%s(nodelist)" % (args[0], args[0]))
+        self.app.run(nodelist, args[0])
 
 if __name__ == '__main__' :
     import sys
