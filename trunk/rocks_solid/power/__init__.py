@@ -64,7 +64,8 @@ class App(object) :
         self.power = power
     
     def run(self, node_list, command) :
-        eval("self.power['%s'].%s(node_list)" % (command, command)
+        eval("self.power['%s'].%s(node_list)" % (command, command))
+
 
 class ClusterPower(rocks.pssh.ClusterFork) :
     def __init__(self, argv, config) :
