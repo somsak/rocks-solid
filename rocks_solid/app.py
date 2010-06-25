@@ -141,7 +141,7 @@ def run_cluster_powersave() :
     import optparse, os
     from rocks_solid import config_read, check_ignore
     from rocks_solid import module_factory
-    from rocks_solid.power import ClusterPower
+    from rocks_solid import power
 
     parser = optparse.OptionParser()
     parser.add_option('-d', '--dryrun', dest='dryrun', action="store_true", default=False,
@@ -270,7 +270,7 @@ def run_cluster_powersave() :
             # while hosts are being powered on
             # we can't do anything about that
         # only power down if there's no waiting job
-        power = ClusterPower(None, config)
+        power = power.App(config)
         if not job_list :
             # all free hosts that's left, power it down!
             poweroff_hosts = all_free_hosts.keys()
@@ -288,18 +288,16 @@ def run_cluster_powersave() :
 
             # power off ndoes
             if poweroff_hosts :
-                power.nodes = poweroff_hosts
                 if not options.dryrun and db:
                     db.insert_event(poweroff_hosts, db.auto_off)
-                    power.run(command=['off'])
+                    power.run(poweroff_hosts, 'off')
                 else :
                     print 'power down %s' % poweroff_hosts
             # power on nodes
         if poweron_hosts :
-            power.nodes = poweron_hosts
             if not options.dryrun and db :
                 db.insert_event(poweroff_hosts, db.auto_on)
-                power.run(command=['on'])
+                power.run(poweron_hosts, 'on')
             else :
                 print 'power on %s' % poweron_hosts
     except :

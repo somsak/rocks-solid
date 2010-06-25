@@ -44,11 +44,11 @@ class Command(command):
     Can be used in place of the 'command' argument.
     </param>
 
-    <example cmd='run host compute-0-0 command="power status"'>
+    <example cmd='run ipmi compute-0-0 command="power status"'>
     Run the IPMI command 'power status' on compute-0-0.
     </example>
 
-    <example cmd='run host compute "power on"'>
+    <example cmd='run ipmi compute "power on"'>
     Run the IPMI command 'power on' on all compute nodes.
     </example>
     """
