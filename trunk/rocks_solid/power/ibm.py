@@ -5,10 +5,10 @@ import subprocess
 
 #from rocks_solid.power import BasePower
 
-#class IBMBladeCenter(BasePower) :
-class IBMBladeCenter :
+#class BladeCenter(BasePower) :
+class BladeCenter :
     '''
-    Power on/off using IBMBladeCenter
+    Power on/off using BladeCenter
     '''
     def __init__(self, config) :
 #        BasePower.__init__(self, config)
@@ -74,7 +74,7 @@ class IBMBladeCenter :
     def status(self, host_list, **kwargs) :
         pass
 
-Power = IBMBladeCenter
+Power = BladeCenter
 
 if __name__ == '__main__' :
     class TestConfig :
@@ -92,6 +92,6 @@ if __name__ == '__main__' :
             setattr(self, 'blademm1_blade[6]', 'app4')
     config = TestConfig()
 
-    blade_center = IBMBladeCenter(config)
+    blade_center = BladeCenter(config)
 
     print blade_center.targets
