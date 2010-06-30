@@ -42,10 +42,11 @@ class BladeCenter :
         return self.targets[host]['mm']
 
     def lookup_target(self, host) :
-        return self.targets[host]['target']
+        return 'system:' + self.targets[host]['target']
 
     def send_ssh_command(self, host, command) :
         '''Send specific command to target'''
+        # ssh -i key -p port <ssh_args> <user>@<host> command -T target
         cmds = ['ssh']
         if self.key :
             cmds = cmds + ['-i', self.key] 
@@ -59,20 +60,34 @@ class BladeCenter :
             user = ''
         blademm = self.lookup_blademm(host)
         target = self.lookup_target(host)
-#        cmds = cmds + [
-#        subprocess.Popen
+
+        cmds = cmds + [ '%s%s' % (user, blademm), command + ' -T ' + target]
+        ssh_cmd = subprocess.Popen(cmds, stdin=None, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        output = ''
+        while True :
+            line = ssh_cmd.stdout.readline()
+            if not line:
+                break
+            if (not line.strip()) or line.startswith('system>') :
+                continue
+            output = output + line
+        ssh_cmd.wait()
+
+#    def send_all_ssh_command(self, host_list, command) :
+#        for host in host_list :
+#            print self.send_ssh_command(host, command)
 
     def on(self, host_list, **kwargs) :
-        pass
+        self.launcher.launch(host_list, self.send_ssh_command, more_arg = 'power -on')
         
     def off(self, host_list, **kwargs) :
-        pass
+        self.launcher.launch(host_list, self.send_ssh_command, more_arg = 'power -off')
 
     def reset(self, host_list, **kwargs) :
-        pass
+        self.launcher.launch(host_list, self.send_ssh_command, more_arg = 'power -cycle')
 
     def status(self, host_list, **kwargs) :
-        pass
+        self.launcher.launch(host_list, self.send_ssh_command, more_arg = 'power -state')
 
 Power = BladeCenter
 
@@ -95,3 +110,5 @@ if __name__ == '__main__' :
     blade_center = BladeCenter(config)
 
     print blade_center.targets
+
+    blade_center.status(['app1', 'app2'])
