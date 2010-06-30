@@ -44,7 +44,7 @@ class IBMBladeCenter :
     def lookup_target(self, host) :
         return self.targets[host]['target']
 
-    def send_ssh_command(self, target, command) :
+    def send_ssh_command(self, host, command) :
         '''Send specific command to target'''
         cmds = ['ssh']
         if self.key :
@@ -57,7 +57,9 @@ class IBMBladeCenter :
             user = self.user + '@'
         else :
             user = ''
-#        cmds = cmds + ['%
+        blademm = self.lookup_blademm(host)
+        target = self.lookup_target(host)
+#        cmds = cmds + [
 #        subprocess.Popen
 
     def on(self, host_list, **kwargs) :
@@ -89,5 +91,7 @@ if __name__ == '__main__' :
             setattr(self, 'blademm1_blade[5]', 'app3')
             setattr(self, 'blademm1_blade[6]', 'app4')
     config = TestConfig()
+
     blade_center = IBMBladeCenter(config)
+
     print blade_center.targets
