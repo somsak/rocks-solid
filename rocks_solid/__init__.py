@@ -178,6 +178,7 @@ class Config :
     num_thread = 10
     wol_interface = 'eth0'
     wol_etherwake = '/sbin/ether-wake'
+    blade_center_ssh_args = ''
 
 def config_read(file = os.sep + os.path.join('etc', 'rocks-solid.conf')) :
     '''
