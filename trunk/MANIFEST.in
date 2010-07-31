@@ -1,2 +1,5 @@
 include *.conf
 include COPYING
+include README.txt
+include rocks/ipmi/*
+include rocks/power/*
