@@ -2,6 +2,7 @@
 #from setuptools import setup, find_packages
 import os, glob, sys
 from distutils.core import setup
+from distutils import sysconfig
 
 name = 'rocks-solid'
 version = '0.5.0b1'
@@ -12,6 +13,7 @@ def list_my_packages() :
         path = os.path.join('rocks_solid', dir)
         if os.path.isdir(path) and (dir != '.svn') and (dir != 'CVS') :
             retval.append(os.path.join('rocks_solid', dir))
+    print retval
     return retval
 
 entry_points = [
@@ -64,6 +66,8 @@ setup(
 
     data_files = [
         ('share/doc/' + name + '-' + version, ['rocks-solid.conf', 'COPYING']),
+        (sysconfig.get_python_lib() + '/rocks/commands/run/ipmi', ['rocks/ipmi/__init__.py']),
+        (sysconfig.get_python_lib() + '/rocks/commands/run/power', ['rocks/power/__init__.py']),
     ],
 #    package_data = {
 #        # If any package contains *.txt or *.rst files, include them:

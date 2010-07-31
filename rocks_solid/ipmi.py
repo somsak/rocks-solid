@@ -5,34 +5,39 @@ IPMI Launcher
 import re, os, sys, string, types
 
 from rocks_solid import Launcher
-import rocks.pssh
+try :
+	import rocks.pssh
+	has_pssh = True
+except ImportError :
+	has_pssh = False
 
-class ClusterIPMI(rocks.pssh.ClusterFork) :
-    def __init__(self, argv, config) :
-        rocks.pssh.ClusterFork.__init__(self, argv)
-        self.ipmi = IPMI(config)
-        self.usage_name = 'Cluster IPMI'
-        self.usage_version = '1.0'
+if has_pssh :
+    class ClusterIPMI(rocks.pssh.ClusterFork) :
+        def __init__(self, argv, config) :
+            rocks.pssh.ClusterFork.__init__(self, argv)
+            self.ipmi = IPMI(config)
+            self.usage_name = 'Cluster IPMI'
+            self.usage_version = '1.0'
 
-    def usageTail(self) :
-        return ' IPMI command'
+        def usageTail(self) :
+            return ' IPMI command'
 
-    def run(self, command=None):
+        def run(self, command=None):
 
-        if self.nodes:
-            nodelist = string.split(self.e.decode(self.nodes), " ")
-        else:
-            self.connect()
-            self.execute(self.query)
-            nodelist = []
-            for host, in self.cursor.fetchall():
-                nodelist.append(host)
+            if self.nodes:
+                nodelist = string.split(self.e.decode(self.nodes), " ")
+            else:
+                self.connect()
+                self.execute(self.query)
+                nodelist = []
+                for host, in self.cursor.fetchall():
+                    nodelist.append(host)
 
-        args = self.getArgs()
-        if not args :
-            self.help()
-            sys.exit(0)
-        self.ipmi.cmd_all(nodelist, self.getArgs())
+            args = self.getArgs()
+            if not args :
+                self.help()
+                sys.exit(0)
+            self.ipmi.cmd_all(nodelist, self.getArgs())
 
 class IPMI(object) :
     def __init__(self, config) :
