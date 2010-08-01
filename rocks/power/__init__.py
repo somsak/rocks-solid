@@ -73,7 +73,12 @@ class Command(command):
         f.close()
 
         #print '** command ** = ', command
-        app.run(hosts, command)
+        #print '** hosts ** = ', hosts
+        cmds = ['on', 'off', 'reset', 'status']
+        if command in cmds :
+            app.run(hosts, command)
+        else :
+            print 'command missing, must be one of ', cmds
 
         #dests = RocksRemoteCollator(self)
         #dests.format = '%o\\n'

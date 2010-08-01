@@ -3,15 +3,14 @@ IBM Blade Center Power Controller
 '''
 import subprocess
 
-#from rocks_solid.power import BasePower
+from rocks_solid.power import BasePower
 
-#class BladeCenter(BasePower) :
-class BladeCenter :
+class BladeCenter(BasePower) :
     '''
     Power on/off using BladeCenter
     '''
     def __init__(self, config) :
-#        BasePower.__init__(self, config)
+        BasePower.__init__(self, config)
         self.port = getattr(config, 'blade_center_ssh_port', 0)
         self.key = getattr(config, 'blade_center_ssh_key', '')
         self.ssh_args = getattr(config, 'blade_center_ssh_args', '')
@@ -72,22 +71,23 @@ class BladeCenter :
                 continue
             output = output + line
         ssh_cmd.wait()
+        return output, ''
 
 #    def send_all_ssh_command(self, host_list, command) :
 #        for host in host_list :
 #            print self.send_ssh_command(host, command)
 
     def on(self, host_list, **kwargs) :
-        self.launcher.launch(host_list, self.send_ssh_command, more_arg = 'power -on')
+        self.launcher.launch(host_list, self.send_ssh_command, more_arg = ['power -on'])
         
     def off(self, host_list, **kwargs) :
-        self.launcher.launch(host_list, self.send_ssh_command, more_arg = 'power -off')
+        self.launcher.launch(host_list, self.send_ssh_command, more_arg = ['power -off'])
 
     def reset(self, host_list, **kwargs) :
-        self.launcher.launch(host_list, self.send_ssh_command, more_arg = 'power -cycle')
+        self.launcher.launch(host_list, self.send_ssh_command, more_arg = ['power -cycle'])
 
     def status(self, host_list, **kwargs) :
-        self.launcher.launch(host_list, self.send_ssh_command, more_arg = 'power -state')
+        self.launcher.launch(host_list, self.send_ssh_command, more_arg = ['power -state'])
 
 Power = BladeCenter
 

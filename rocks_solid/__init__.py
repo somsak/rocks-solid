@@ -297,6 +297,7 @@ class Launcher(object) :
 
             if delay >= 0:
                 time.sleep(delay)
+                #print args
                 output, error = func(*args)
                 output_handler(host, output, error)
             elif delay < 0 :
