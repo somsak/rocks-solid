@@ -221,12 +221,16 @@ def run_cluster_powersave() :
             # pick the first queue
             default_queue = queues[0].name
 
-#        if options.verbose :
-#            for item in queue_dict.iteritems() :
-#                print item[0], item[1]
+        if options.verbose :
+            for item in queue_dict.iteritems() :
+                print item[0], item[1]
 
         # query job list information
         job_list = scheduler.list()
+        if options.verbose :
+            print '*** Job List ***'
+            print job_list
+
         i = 0
         while i < len(job_list) :
             if job_list[i].state == 'running' :
@@ -288,15 +292,17 @@ def run_cluster_powersave() :
 
             # power off ndoes
             if poweroff_hosts :
-                if not options.dryrun and db:
-                    db.insert_event(poweroff_hosts, db.auto_off)
+                if not options.dryrun :
+                    if db:
+                        db.insert_event(poweroff_hosts, db.auto_off)
                     power.run(poweroff_hosts, 'off')
                 else :
                     print 'power down %s' % poweroff_hosts
             # power on nodes
         if poweron_hosts :
-            if not options.dryrun and db :
-                db.insert_event(poweroff_hosts, db.auto_on)
+            if not options.dryrun :
+                if db :
+                    db.insert_event(poweroff_hosts, db.auto_on)
                 power.run(poweron_hosts, 'on')
             else :
                 print 'power on %s' % poweron_hosts

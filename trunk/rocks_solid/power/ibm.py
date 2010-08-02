@@ -38,10 +38,16 @@ class BladeCenter(BasePower) :
         del self.amm_hostnames
 
     def lookup_blademm(self, host) :
-        return self.targets[host]['mm']
+        try :
+            return self.targets[host]['mm']
+        except KeyError :
+            return self.targets[host.split('.')[0]]['mm']
 
     def lookup_target(self, host) :
-        return 'system:' + self.targets[host]['target']
+        try :
+            return 'system:' + self.targets[host]['target']
+        except KeyError :
+            return 'system:' + self.targets[host.split('.')[0]]['target']
 
     def send_ssh_command(self, host, command) :
         '''Send specific command to target'''
