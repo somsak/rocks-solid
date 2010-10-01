@@ -138,7 +138,7 @@ def run_cluster_clean_ps() :
         sys.exit(1)
 
 def run_cluster_powersave() :
-    import optparse, os
+    import optparse, os, sys
     from rocks_solid import config_read, check_ignore
     from rocks_solid import module_factory
     from rocks_solid import power
