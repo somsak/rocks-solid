@@ -4,7 +4,11 @@
 import os
 import rocks.commands
 
-from rocks.commands.run.host import RocksRemoteCollator
+try :
+	from rocks.commands.run.host import RocksRemoteCollator
+	has_rocks_remote_collator = 1
+except :
+	has_rocks_remote_collator = 0
 
 import lekatnet.config as config
 import lekatnet.remote as remote
